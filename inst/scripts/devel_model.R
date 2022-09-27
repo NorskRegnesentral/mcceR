@@ -44,16 +44,25 @@ pred_train <- predict_model.ratio(model=model,newdata=x_train)
 
 model
 pred_train
-x_train
+x_train <- setDT(x_train)
 fixed_features
 c_val = 0.1
 
 
-fit <- fit_data(x_train = head(x_train,5000),
-                pred_train = head(pred_train,5000),
-                fixed_features = fixed_features,
-                c_val = c_val,
-                autoregressive_model = "ctree",
-                seed = 123)
+fit_object <- fit(x_train = head(x_train,5000),
+                  pred_train = head(pred_train,5000),
+                  fixed_features = fixed_features,
+                  c_val = c_val,
+                  autoregressive_model = "rpart",
+                  seed = 123)
+
+
+x_explain <- setDT(x_train[ind0])
+
+sims <- generate(x_explain, fit_object=fit_object, K = 10000, seed=123)
+
+sims$time_sample
+
+
 
 

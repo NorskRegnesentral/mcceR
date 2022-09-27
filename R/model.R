@@ -1,6 +1,6 @@
-#' Fit and sample a set of ctrees based on mutable (not fixed) features
+#' Fit autoregressive model to the training data
 #'
-#' @param x_train Data.frame or data.table of features and response
+#' @param x_train Data.frame or data.table of features
 #'
 #' @param pred_train Numeric vector. Specifies the prediction value for the observations in x_train.
 #'
@@ -77,7 +77,10 @@ fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), auto
   ret <- list(model_list = model_list,
               time_fit = time_fit,
               fixed_features = fixed_features,
-              mutable_features = mutable_features)
+              mutable_features = mutable_features,
+              autoregressive_model = autoregressive_model,
+              include_decision = include_decision,
+              x_train = x_train)
 
   return(ret)
 }
