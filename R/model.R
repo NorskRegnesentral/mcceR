@@ -10,13 +10,15 @@
 #'
 #' @param autoregressive_model Character. Specifies the name of the autoregressive model used to fit the data.
 #'
+#' @param include_decision Logical. Whether to include the decision threshold as a binary features to improve the efficiency of MCCE.
+#'
 #' @param seed Numeric.
 #'
-#' @return List. Includes \code{synData} of class "synds" which includes the counterfactual exaplanations.
+#' @return List. Includes model_list with the fitted models
 #'
 #' @export
 #'
-fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), autoregressive_model="ctree", seed=NULL){
+fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), autoregressive_model="ctree", seed=NULL,include_decision = TRUE){
 
   if(!is.null(seed)) set.seed(seed)
 
@@ -36,10 +38,12 @@ fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), auto
     )
   }
 
-  decision0 <- (pred_train>=c_val)*1
+  if(include_decision){
+    decision0 <- (pred_train>=c_val)*1
 
-#  x_train[,decision := decision0]
-  set(x_train, i = NULL, j="decision", value=decision0)
+    #  x_train[,decision := decision0]
+    set(x_train, i = NULL, j="decision", value=decision0)
+  }
 
   fixed_features <- c(fixed_features,"decision")
 
@@ -71,7 +75,9 @@ fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), auto
 
   time_fit = difftime(Sys.time(), time_fit_start, units = "secs")
   ret <- list(model_list = model_list,
-              time_fit = time_fit)
+              time_fit = time_fit,
+              fixed_features = fixed_features,
+              mutable_features = mutable_features)
 
   return(ret)
 }
