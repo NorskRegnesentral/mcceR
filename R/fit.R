@@ -1,29 +1,29 @@
 #' Fit autoregressive model to the training data
 #'
-#' @param x_train Data.frame or data.table of features
+#' @param autoregressive_model Character.
+#' Specifies the name of the autoregressive model used to fit the data.
 #'
-#' @param pred_train Numeric vector. Specifies the prediction value for the observations in x_train.
+#' @param pred_train Numeric vector.
+#' The prediction score for the data in x_train.
+#' @param decision Logical.
+#' Whether to include the decision threshold as a binary features to improve the efficiency of MCCE.
 #'
-#' @param fixed_features Character vector. Names of features to fix in counterfactual generation.
+#' @param seed Positive integer.
+#' Specifies the seed used when fitting the autoregressive feature dependence model.
+#' If `NULL` the seed will be inherited from the calling environment.
 #'
-#' @param c_val Numeric. Specifying the decision threshold to exceed to achieve the right decison
-#'
-#' @param autoregressive_model Character. Specifies the name of the autoregressive model used to fit the data.
-#'
-#' @param include_decision Logical. Whether to include the decision threshold as a binary features to improve the efficiency of MCCE.
-#'
-#' @param seed Numeric.
+#' @inheritParams explain_mcce
 #'
 #' @return List. Includes model_list with the fitted models
 #'
 #' @export
 #'
-fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), autoregressive_model="ctree", seed=NULL,include_decision = TRUE){
+fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1), autoregressive_model="ctree", seed=NULL,decision = TRUE){
 
   if(!is.null(seed)) set.seed(seed)
 
   if (!is.matrix(x_train) && !is.data.frame(x_train)) {
-    stop(paste0(stop_message,"x_train should be a matrix or a data.frame/data.table.\n"))
+    stop("x_train should be a matrix or a data.frame/data.table.\n")
   } else {
     x_train <- data.table::as.data.table(x_train)
   }
@@ -38,11 +38,11 @@ fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), auto
     )
   }
 
-  if(include_decision){
-    decision0 <- (pred_train>=c_val)*1
+  if(decision){
+    decision0 <- (pred_train>=c_int[1] & pred_train<=c_int[2])*1
 
     #  x_train[,decision := decision0]
-    set(x_train, i = NULL, j="decision", value=decision0)
+    data.table::set(x_train, i = NULL, j="decision", value=decision0)
   }
 
   fixed_features <- c(fixed_features,"decision")
@@ -79,8 +79,9 @@ fit = function(x_train, pred_train, fixed_features, c_val=mean(pred_train), auto
               fixed_features = fixed_features,
               mutable_features = mutable_features,
               autoregressive_model = autoregressive_model,
-              include_decision = include_decision,
-              x_train = x_train)
+              decision = decision,
+              x_train = x_train,
+              c_int = c_int)
 
   return(ret)
 }

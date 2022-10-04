@@ -1,14 +1,18 @@
 #' Generate potential counterfactuals from fitted autoregressive model
 #'
-#' @param x_explain Data.frame or data.table of features to generate counterfactuals for
+#' @param fit_object List.
+#' The output from calling the fit() function.
 #'
-#' @param fit_object List. The output from calling the fit function.
+#' @param K Numeric.
+#' Number of potential counterfactuals to generate per row in x_explain.
 #'
-#' @param K Numeric. Number of potential counterfactuals to generate#'
+#' @param seed Positive integer.
+#' Specifies the seed used when generating the potential counterfactuals.
+#' If `NULL` the seed will be inherited from the calling environment.
 #'
-#' @param seed Numeric.
+#' @inheritParams explain_mcce
 #'
-#' @return data.table. The simulated data with a dec
+#' @return List. The generated potential counterfactuals and the timing of this function.
 #'
 #' @export
 #'
@@ -18,29 +22,29 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
 
   mutable_features <- fit_object$mutable_features
   fixed_features <- fit_object$fixed_features
-  include_decision <- fit_object$include_decision
+  decision <- fit_object$decision
   x_train <- fit_object$x_train
   model_list <- fit_object$model_list
   autoregressive_model <- fit_object$autoregressive_model
   n_explain <- nrow(x_explain)
 
   if (!is.matrix(x_explain) && !is.data.frame(x_explain)) {
-    stop(paste0(stop_message,"x_explain should be a matrix or a data.frame/data.table.\n"))
+    stop("x_explain should be a matrix or a data.frame/data.table.\n")
   } else {
     x_explain <- data.table::as.data.table(x_explain)
   }
 
 
-  if(include_decision){
+  if(decision){
     set(x_explain, i = NULL, j="decision", value=1)
   }
 
   explain_vec <- rep(seq_len(n_explain), each = K)
 
-  time_sample_start = Sys.time()
+  time_generate_start = Sys.time()
 
   simData <- x_explain[explain_vec, fixed_features,with=F]
-  simData <- setDT(simData)
+  simData <- data.table::setDT(simData)
 
   rowno <- seq_len(nrow(x_train))
   N_mutable <- length(mutable_features)
@@ -64,28 +68,28 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
 
       newrowno <- sample(rowno[fit.nodes == pred_node], length(these_rows),replace = TRUE)
       tmp <- unlist(x_train[newrowno, this_feature, with=F])
-      set(simData,i = these_rows,j=this_feature, value = tmp)
+      data.table::set(simData,i = these_rows,j=this_feature, value = tmp)
     }
   }
-  setcolorder(simData, neworder = names(x_train))
-  set(simData,j="id_explain", value = explain_vec)
+  data.table::setcolorder(simData, neworder = names(x_train))
+  data.table::set(simData,j="id_explain", value = explain_vec)
 
-  if(include_decision){
-    set(simData, i = NULL, j="decision", value=NULL)
+  if(decision){
+    data.table::set(simData, i = NULL, j="decision", value=NULL)
   }
-  setcolorder(simData,"id_explain")
+  data.table::setcolorder(simData,"id_explain")
 
-  time_sample = difftime(Sys.time(), time_sample_start, units = "secs")
+  time_generate = difftime(Sys.time(), time_generate_start, units = "secs")
 
   ret <- list(simData = simData,
-              time_sample = time_sample)
+              time_generate = time_generate)
 
   return(ret)
 }
 
 
 predict_node.ctree <- function(model,newdata=NULL){
-  partykit::where(object=model,newdata=newdata)
+  party::where(object=model,newdata=newdata)
 }
 
 predict_node.rpart <- function(model,newdata=NULL){
