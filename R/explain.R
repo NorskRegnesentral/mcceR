@@ -52,12 +52,27 @@
 #'
 #' @export
 #'
-explain_mcce = function(model, x_explain, x_train, predict_model, fixed_features, c_int=c(0.5,1),
+explain_mcce = function(model, x_explain, x_train, predict_model=shapr::predict_model,
+                        fixed_features, c_int=c(0.5,1),
                         fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
                         generate.K = 1000, generate.seed = NULL,
                         process.measures = c("validation","L0","L1"),process.return_best_k = TRUE, process.remove_invalid = TRUE, process.sort_by_measures_order = TRUE){
 
-  pred_train <- predict_model(model=model,newdata=x_train)
+  if (!is.matrix(x_train) && !is.data.frame(x_train)) {
+    stop("x_train should be a matrix or a data.frame/data.table.\n")
+  } else {
+    x_train <- data.table::as.data.table(x_train)
+  }
+
+  if (!is.matrix(x_explain) && !is.data.frame(x_explain)) {
+    stop("x_explain should be a matrix or a data.frame/data.table.\n")
+  } else {
+    x_explain <- data.table::as.data.table(x_explain)
+  }
+
+
+
+  pred_train <- predict_model(model,x_train)
 
   fit_object <- fit(x_train = x_train,
                     pred_train = pred_train,
@@ -76,7 +91,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model, fixed_features
 
   x_sim <- sim_object$simData
 
-  pred_sim <- predict_model(model=model,newdata=x_sim)
+  pred_sim <- predict_model(model,x_sim[,-"id_explain"])
 
   cfs <- process(x_sim = x_sim,
                  pred_sim = pred_sim,
@@ -91,7 +106,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model, fixed_features
                 generate.time=sim_object$time_generate,
                 process.time=cfs$time_process)
 
-  ret <- list(cf = cfs,
+  ret <- list(cf = cfs$cf,
               fixed_features = fit_object$fixed_features,
               mutable_features = fit_object$mutable_features,
               time = time_vec)

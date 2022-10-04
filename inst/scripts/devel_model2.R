@@ -45,3 +45,36 @@ cf <- explain_mcce(model = model,
 
 
 
+
+library(xgboost)
+data("Boston", package = "MASS")
+
+x_var <- c("lstat", "rm", "dis", "indus")
+y_var <- "medv"
+
+ind_x_test <- 1:6
+x_train <- as.matrix(Boston[-ind_x_test, x_var])
+y_train <- Boston[-ind_x_test, y_var]
+x_test <- as.matrix(Boston[ind_x_test, x_var])
+
+# Fitting a basic xgboost model to the training data
+model <- xgboost(
+  data = x_train,
+  label = y_train,
+  nround = 20,
+  verbose = FALSE
+)
+
+predict(model,x_test)
+
+cf.Boston <- explain_mcce(model = model,
+                   x_explain = x_test,
+                   x_train = x_train,
+                   fixed_features = "lstat",
+                   c_int=c(35,1000),
+                   fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
+                   generate.K = 1000, generate.seed = NULL,
+                   process.measures = c("validation","L0","L1"),process.return_best_k = TRUE, process.remove_invalid = TRUE, process.sort_by_measures_order = TRUE)
+
+
+
