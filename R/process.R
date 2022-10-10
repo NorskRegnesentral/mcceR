@@ -44,6 +44,12 @@ process = function(x_sim,
     x_sim <- data.table::as.data.table(x_sim)
   }
 
+  if (!is.matrix(x_explain) && !is.data.frame(x_explain)) {
+    stop("x_explain should be a matrix or a data.frame/data.table.\n")
+  } else {
+    x_explain <- data.table::as.data.table(x_explain)
+  }
+
 
   mutable_features <- fit_object$mutable_features
   fixed_features <- fit_object$fixed_features
