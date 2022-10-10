@@ -38,6 +38,13 @@ process = function(x_sim,
                    return_best_k = 1,
                    sort_by_measures_order = TRUE){ # Don't obey this quite yet
 
+  if (!is.matrix(x_sim) && !is.data.frame(x_sim)) {
+    stop("x_sim should be a matrix or a data.frame/data.table.\n")
+  } else {
+    x_sim <- data.table::as.data.table(x_sim)
+  }
+
+
   mutable_features <- fit_object$mutable_features
   fixed_features <- fit_object$fixed_features
   decision <- fit_object$decision

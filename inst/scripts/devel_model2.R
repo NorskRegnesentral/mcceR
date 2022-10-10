@@ -71,10 +71,8 @@ cf.Boston <- explain_mcce(model = model,
                    x_explain = x_test,
                    x_train = x_train,
                    fixed_features = "lstat",
-                   c_int=c(35,1000),
-                   fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
-                   generate.K = 1000, generate.seed = NULL,
-                   process.measures = c("validation","L0","L1"),process.return_best_k = TRUE, process.remove_invalid = TRUE, process.sort_by_measures_order = TRUE)
+                   c_int=c(35,1000))
+
 
 
 
