@@ -56,7 +56,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model=shapr::predict_
                         fixed_features, c_int=c(0.5,1),
                         fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
                         generate.K = 1000, generate.seed = NULL,
-                        process.measures = c("validation","L0","L1"),process.return_best_k = TRUE, process.remove_invalid = TRUE, process.sort_by_measures_order = TRUE){
+                        process.measures = c("validation","L0","L1"),process.return_best_k = 1, process.remove_invalid = TRUE, process.sort_by_measures_order = TRUE){
 
   if (!is.matrix(x_train) && !is.data.frame(x_train)) {
     stop("x_train should be a matrix or a data.frame/data.table.\n")
