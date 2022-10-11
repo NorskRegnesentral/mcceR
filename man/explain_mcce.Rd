@@ -8,7 +8,7 @@ explain_mcce(
   model,
   x_explain,
   x_train,
-  predict_model,
+  predict_model = shapr::predict_model,
   fixed_features,
   c_int = c(0.5, 1),
   fit.autoregressive_model = "ctree",
@@ -17,7 +17,7 @@ explain_mcce(
   generate.K = 1000,
   generate.seed = NULL,
   process.measures = c("validation", "L0", "L1"),
-  process.return_best_k = TRUE,
+  process.return_best_k = 1,
   process.remove_invalid = TRUE,
   process.sort_by_measures_order = TRUE
 )
