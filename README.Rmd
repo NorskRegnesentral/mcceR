@@ -56,14 +56,16 @@ model <- xgboost(
   verbose = FALSE
 )
 
-#predict(model,x_train)
+#predict(model,x_train) 
 
 explained <- explain_mcce(model = model,
                           x_explain = x_explain,
                           x_train = x_train,
                           c_int = c(-Inf,15),
                           predict_model=NULL,
-                          fixed_features = "Wind")
+                          fixed_features = "Wind",
+                          fit.seed = 123,
+                          generate.seed = 123)
 
 
 explained$cf
