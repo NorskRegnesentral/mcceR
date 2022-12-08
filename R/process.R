@@ -74,12 +74,26 @@ process = function(x_sim,
 
   res.dt <- data.table::data.table(row_id=seq_len(nrow(x_sim)),id_explain=x_sim[,id_explain])
 
+  for(i in measures){
 
-  get_measure_validation(res.dt,x_explain_mutable,x_sim_mutable,pred_sim,c_int)
+    this_measure <- measures[i]
 
-  get_measure_sparsity(res.dt,x_explain_mutable,x_sim_mutable)
-  get_measure_manhattan(res.dt,x_explain_mutable,x_sim_mutable)
-  get_measure_euclidean(res.dt,x_explain_mutable,x_sim_mutable)
+    if(this_measure=="validation"){
+      get_measure_validation(res.dt,x_explain_mutable,x_sim_mutable,pred_sim,c_int)
+    }
+
+    if(this_measure=="L0"){
+      get_measure_sparsity(res.dt,x_explain_mutable,x_sim_mutable)
+    }
+    if(this_measure=="L1"){
+      get_measure_manhattan(res.dt,x_explain_mutable,x_sim_mutable)
+    }
+    if(this_measure=="L2"){
+      get_measure_euclidean(res.dt,x_explain_mutable,x_sim_mutable)
+    }
+
+  }
+
 
   data.table::setorder(res.dt,id_explain,-measure_validation,measure_sparsity,measure_manhattan,measure_euclidean)
 
