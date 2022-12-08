@@ -80,16 +80,13 @@ def explain_mcce(
         return_best_k = process_return_best_k,
         sort_by_measures_order = process_sort_by_measures_order)
 
-    #time_vec = [fit_time = rfit_object.rx2('time_fit'),
-    #            generate_time = rsim_object.rx2('time_generate'),
-    #            process_time = rcfs.rx2('time_process')]
-
-    #ret = list(cf = cfs$cf,
-    #          fixed_features = fit_object$fixed_features,
-    #          mutable_features = fit_object$mutable_features,
-    #          time = time_vec)
-
-    ret = rcfs.rx2('cf')
-    return r2py(ret)
+    time_vec = {"fit_time" : round(r2py(rfit_object.rx2('time_fit'))[0],4),
+                "generate_time" : round(r2py(rsim_object.rx2('time_generate'))[0],4),
+                "process_time" : round(r2py(rcfs.rx2('time_process'))[0],4)}
 
 
+    ret = {"cf": r2py(rcfs.rx2('cf')),
+          "fixed_features": r2py(rfit_object.rx2('fixed_features')),
+          "time": time_vec} 
+          
+    return ret

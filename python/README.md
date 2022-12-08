@@ -3,12 +3,34 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-mcceRpy is a Python wrapper package for the R-package mcceR. 
+mcceRpy is a Python wrapper package for the R-package mcceR, built using the rpy2 python library (https://github.com/rpy2/rpy2)
 
 ## Installation
 
 Being a python wrapper for an R-package, this package requires installation of both R and quite a few R-packages to function.
-Below is a full description on how to do all of this within a conda environment without causing conflicts between conda and pip.
+
+There are several ways of installing R, depending on your system. 
+Official instructions can be found her (https://cran.r-project.org/)
+R can also be installed with pip as follows:
+```
+pip install rbase
+```
+and conda:
+```
+conda install -c r r
+```
+
+Once R is installed, you need to install the ´mcceR´ R-package, in addition to quite a few more common R-packages. From the folder of this file, these can be installed as
+
+```
+Rscript install_r_packages.R
+```
+
+
+
+
+
+Below is a brief description.
 We recommend running this package on Linux, as the Python -> R bridge works best there, see https://github.com/rpy2/rpy2.
 The below instructions show how to set up a new conda environment with everything you need from a Linux terminal.
 
@@ -38,7 +60,7 @@ Install conda-forge and other necessary python packages
 ```
 conda install -c r r
 
-conda install -c conda-forge rpy2
+conda install -c conda-forge rpy2 pandas numpy
 ```
 
 
