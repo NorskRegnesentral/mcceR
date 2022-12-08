@@ -46,6 +46,55 @@ def explain_mcce(
     generate_K = 1000, generate_seed = None,
     process_measures = ["validation","L0","L1"], process_return_best_k = 1, 
     process_remove_invalid = True, process_sort_by_measures_order = True):
+      
+    """Explain predictions with Monte Carlo Counterfactual Explanations (MCCE) 
+
+    Parameters
+    ----------
+    model : 
+        The model whose predictions we want to explain.
+    x_explain : pandas DataFrame.
+        Contains the data that we want to generate counterfactuals for.
+    x_train : pandas DataFrame.
+        Contains the data used to train the autoregressive feature dependence model.
+    predict_model : Function.
+        The function must have two arguments, `model` and `newdata` which specify, respectively, the model
+        and a data.frame/data.table to compute predictions for. The function must give the prediction as a numeric vector.
+    fixed_features : Character vector.
+        Names of features to fix in counterfactual generation.
+    c_int : Numeric vector (length 2).
+        Contains the data used to train the autoregressive feature dependence model.
+    fit.autoregressive_model : Character.
+        Specifies the name of the autoregressive model used to fit the data.
+    fit.decision : Logical.
+        Whether to include the decision threshold as a binary features to improve the efficiency of MCCE.
+    fit.seed : Positive integer.
+        Specifies the seed used when fitting the autoregressive feature dependence model.
+        If `NULL` the seed will be inherited from the calling environment.
+    generate.K : Numeric.
+        Number of potential counterfactuals to generate per row in x_explain.
+    generate.seed : Positive integer.
+        Specifies the seed used when generating the potential counterfactuals.
+        If `NULL` the seed will be inherited from the calling environment.
+    process.measures : Character vector.
+        Indicates the measures (in the given order) that are applied to the simulate data.
+    process.return_best_k : Integer.
+        How many counterfactuals should be generated per prediction to explain (at max).
+    process.remove_invalid : Logical.
+        Indicates whether invalid counterfactuals should be removed from the returned counterfactual list.
+    process.sort_by_measures_order : Logical.
+        Indicates whether the counterfactuals should be sorted.
+    Returns
+    -------
+    cf
+        pandas DataFrame with the generated counterfactual explanations
+    time
+        timing of the three different parts of the algorithm
+    fixed_features
+        character vector with the fixed features
+    """
+      
+      
 
     pred_train = predict_model(model,x_train)
 

@@ -26,43 +26,55 @@ Once R is installed, you need to install the ´mcceR´ R-package, in addition to
 Rscript install_r_packages.R
 ```
 
+On the Python side you need *rpy2* library, installed with e.g.
+```
+pip install rpy2
+```
+and a few other basic packages like *numpy* and *pandas*.
 
-
-
-
-Below is a brief description.
-We recommend running this package on Linux, as the Python -> R bridge works best there, see https://github.com/rpy2/rpy2.
-The below instructions show how to set up a new conda environment with everything you need from a Linux terminal.
-
-### Download and install miniconda (if not already installed)
-Download Miniconda from here: https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links
+Finally, install the *mcceRpy* library from the present folder:
 
 ```
-bash Miniconda3-latest-Linux-x86_64.sh # install miniconda
-```
-Check +update conda installation
-```
-conda --version
-conda update conda # Updates conda (Answer y)
+pip install -e .
 ```
 
-Set up conda environment with Python version X.Y.Z (3.5.0+ is required, see https://rpy2.github.io/doc/v3.0.x/html/overview.html#requirements)
+## Example
+
+Here is a basic example of using the *mcceRpy* library
+
 ```
-conda create -n "TESTmcceRpy" python=3.7.15 ipython
+from mcceRpy import explain_mcce 
+from mcceRpy import datasets
+
+import xgboost as xgb
+import numpy as np
+
+dfx_train, dfx_test, dfy_train, dfy_test = datasets.load_california_housing()
+
+## Fit model
+dtrain = xgb.DMatrix(data=dfx_train, label=dfy_train)
+model = xgb.train(params={}, num_boost_round=20, dtrain=dtrain)
+
+def xgb_predict_model(model,newdata):
+  return model.predict(xgb.DMatrix(newdata))
+
+a=xgb_predict_model(model,dfx_test)
+
+cf_test = explain_mcce.explain_mcce(
+  model = model,
+  x_explain = dfx_test,
+  x_train = dfx_train,
+  predict_model = xgb_predict_model,
+  fixed_features = ["MedInc"],
+  c_int = np.array([2,100]),
+  fit_autoregressive_model="ctree", fit_decision = True, fit_seed = None,
+  generate_K = 1000, generate_seed = None,
+  process_measures = ["validation","L0","L1"], process_return_best_k = 1,
+  process_remove_invalid = True, process_sort_by_measures_order = True)
+
+
+cf_test
 ```
 
-Activate the conda environment
-```
-conda activate TESTmcceRpy
-```
 
-Install conda-forge and other necessary python packages
-```
-conda install -c r r
-
-conda install -c conda-forge rpy2 pandas numpy
-```
-
-
-CONTINUE HERE!!!!
 
