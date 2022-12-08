@@ -1,5 +1,5 @@
-import explain_mcce as mcceRpy
-import datasets
+from mcceRpy import explain_mcce 
+from mcceRpy import datasets
 
 #### Run python code ####
 
@@ -17,7 +17,7 @@ def xgb_predict_model(model,newdata):
 
 a=xgb_predict_model(model,dfx_test)
 
-cf_test = mcceRpy.explain_mcce(
+cf_test = explain_mcce.explain_mcce(
   model = model,
   x_explain = dfx_test,
   x_train = dfx_train,
