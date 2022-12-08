@@ -5,3 +5,7 @@
 .DS_Store
 
 python/README.html
+
+python/mcceRpy.egg-info/
+
+python/mcceRpy/__pycache__/
