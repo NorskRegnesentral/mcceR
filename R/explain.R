@@ -70,9 +70,8 @@ explain_mcce = function(model, x_explain, x_train, predict_model=shapr::predict_
     x_explain <- data.table::as.data.table(x_explain)
   }
 
-  if(is.null(predict_model)){
-    predict_model <- mcceR::predict_model
-  }
+  predict_model <- get_predict_model(predict_model, model)
+
 
   pred_train <- predict_model(model,x_train)
 
@@ -108,7 +107,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model=shapr::predict_
                 generate.time=sim_object$time_generate,
                 process.time=cfs$time_process)
 
-  ret <- list(cf = cfs$cf,
+  ret <- list(cf = cfs$cf[],
               fixed_features = fit_object$fixed_features,
               mutable_features = fit_object$mutable_features,
               time = time_vec)

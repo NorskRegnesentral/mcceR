@@ -38,6 +38,12 @@ model <- lm(as.formula(paste0(y_var,"~.")),data = xy_train)
 
 predict(model,x_test)
 
+### Manually adjust model parameters to match those in python:
+
+model$coefficients <- c(8.632407012695102,-0.6668123 ,  4.54767491, -0.92003323, -0.24707083)
+
+predict(model,x_test)
+
 
 cf.Boston <- explain_mcce(model = model,
                           x_explain = x_test,
@@ -47,4 +53,35 @@ cf.Boston <- explain_mcce(model = model,
 
 
 cf.Boston$cf[]
+
+
+#### Xgbost model on these data as well:
+library(xgboost)
+data("Boston", package = "MASS")
+
+x_var <- c("lstat", "rm", "dis", "indus")
+y_var <- "medv"
+
+ind_x_test <- 1:6
+x_train <- as.matrix(Boston[-ind_x_test, x_var])
+y_train <- Boston[-ind_x_test, y_var]
+x_test <- as.matrix(Boston[ind_x_test, x_var])
+
+# Fitting a basic xgboost model to the training data
+model <- xgboost(
+  data = x_train,
+  label = y_train,
+  nround = 20,
+  verbose = FALSE
+)
+
+predict(model,x_test)
+
+cf.Boston <- explain_mcce(model = model,
+                          x_explain = x_test,
+                          x_train = x_train,
+                          fixed_features = "lstat",
+                          c_int=c(35,1000))
+
+
 

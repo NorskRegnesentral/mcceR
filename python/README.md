@@ -13,7 +13,7 @@ We recommend running this package on Linux, as the Python -> R bridge works best
 The below instructions show how to set up a new conda environment with everything you need from a Linux terminal.
 
 ### Download and install miniconda (if not already installed)
-Download Miniconda from here: https://docs.conda.io/en/latest/miniconda.html#linux-installers
+Download Miniconda from here: https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links
 
 ```
 bash Miniconda3-latest-Linux-x86_64.sh # install miniconda
@@ -26,7 +26,21 @@ conda update conda # Updates conda (Answer y)
 
 Set up conda environment with Python version X.Y.Z (3.5.0+ is required, see https://rpy2.github.io/doc/v3.0.x/html/overview.html#requirements)
 ```
-conda create -n "TESTmcceRpy" python=3.10.7 ipython
+conda create -n "TESTmcceRpy" python=3.7.15 ipython
 ```
+
+Activate the conda environment
+```
+conda activate TESTmcceRpy
+```
+
+Install conda-forge and other necessary python packages
+```
+conda install -c r r
+
+conda install -c conda-forge rpy2
+```
+
+
 CONTINUE HERE!!!!
 

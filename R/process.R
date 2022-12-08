@@ -74,28 +74,31 @@ process = function(x_sim,
 
   res.dt <- data.table::data.table(row_id=seq_len(nrow(x_sim)),id_explain=x_sim[,id_explain])
 
-  for(i in measures){
-
-    this_measure <- measures[i]
+  measure_ordering <- c()
+  for(this_measure in measures){
 
     if(this_measure=="validation"){
       get_measure_validation(res.dt,x_explain_mutable,x_sim_mutable,pred_sim,c_int)
+      measure_ordering <- c(measure_ordering,-1)
     }
 
     if(this_measure=="L0"){
-      get_measure_sparsity(res.dt,x_explain_mutable,x_sim_mutable)
+      get_measure_L0(res.dt,x_explain_mutable,x_sim_mutable)
+      measure_ordering <- c(measure_ordering,1)
     }
     if(this_measure=="L1"){
-      get_measure_manhattan(res.dt,x_explain_mutable,x_sim_mutable)
+      get_measure_L1(res.dt,x_explain_mutable,x_sim_mutable)
+      measure_ordering <- c(measure_ordering,1)
     }
     if(this_measure=="L2"){
-      get_measure_euclidean(res.dt,x_explain_mutable,x_sim_mutable)
+      get_measure_L2(res.dt,x_explain_mutable,x_sim_mutable)
+      measure_ordering <- c(measure_ordering,1)
     }
 
   }
 
 
-  data.table::setorder(res.dt,id_explain,-measure_validation,measure_sparsity,measure_manhattan,measure_euclidean)
+  data.table::setorderv(res.dt,cols=c("id_explain",paste0("measure_",measures)),order = c(1,measure_ordering))
 
   res.dt[, counterfactual_rank := 1:.N, by = id_explain]
 
@@ -126,27 +129,27 @@ get_measure_validation <- function(res.dt,x_explain_mutable,x_sim_mutable,pred_s
 }
 
 
-get_measure_sparsity <- function(res.dt,x_explain_mutable,x_sim_mutable){
+get_measure_L0 <- function(res.dt,x_explain_mutable,x_sim_mutable){
   n_explain <- x_explain_mutable[,.N]
   for (i in seq_len(n_explain)){
     value <- Rfast::colsums(unlist(x_explain_mutable[id_explain==i,-1])-t(as.matrix(x_sim_mutable[id_explain==i,-1]))==0,parallel=T)
-    res.dt[id_explain==i,measure_sparsity:=value]
+    res.dt[id_explain==i,measure_L0:=value]
   }
 }
-get_measure_manhattan <- function(res.dt,x_explain_mutable,x_sim_mutable){
+get_measure_L1 <- function(res.dt,x_explain_mutable,x_sim_mutable){
   n_explain <- x_explain_mutable[,.N]
   for (i in seq_len(n_explain)){
     value <- Rfast::dista(x_explain_mutable[id_explain==i,-1],x_sim_mutable[id_explain==i,-1],trans=F,type = "manhattan")
-    res.dt[id_explain==i,measure_manhattan:=value]
+    res.dt[id_explain==i,measure_L1:=value]
     #set(res.dt,i=which(res.dt$id_explain==i),j = "measure_manhattan",value = Rfast::dista(x_explain_mutable[id_explain==i,-1],x_sim_mutable[id_explain==i,-1],trans=F,type = "manhattan"))
   }
 }
 
-get_measure_euclidean <- function(res.dt,x_explain_mutable,x_sim_mutable){
+get_measure_L2 <- function(res.dt,x_explain_mutable,x_sim_mutable){
   n_explain <- x_explain_mutable[,.N]
   for (i in seq_len(n_explain)){
     value <- Rfast::dista(x_explain_mutable[id_explain==i,-1],x_sim_mutable[id_explain==i,-1],trans=F)
-    res.dt[id_explain==i,measure_euclidean:=value]
+    res.dt[id_explain==i,measure_L2:=value]
 #    set(res.dt,i=which(res.dt$id_explain==i),j="measure_euclidean",value = Rfast::dista(x_explain_mutable[id_explain==i,-1],x_sim_mutable[id_explain==i,-1],trans=F))
   }
 }

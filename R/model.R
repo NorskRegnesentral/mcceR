@@ -114,3 +114,41 @@ predict_model.glm <- function(x, newdata) {
     predict(x, as.data.frame(newdata))
   }
 }
+
+
+#' Model testing function
+#'
+#' @keywords internal
+get_predict_model <- function(predict_model, model) {
+
+  # Checks that predict_model is a proper function (R + py)
+  # Extracts natively supported functions for predict_model if exists and not passed (R only)
+  # Checks that predict_model provide the right output format (R and py)
+  # Returns the predict_model to use subsequently (R only)
+
+  model_class0 <- class(model)[1]
+
+  # checks predict_model
+  if(!(is.function(predict_model)) &&
+     !(is.null(predict_model))){
+    stop("`predict_model` must be NULL or a function.")
+  }
+
+  supported_models <- substring(rownames(attr(methods(predict_model), "info")),first=15)
+
+  # Get native predict_model if not passed and exists
+  if (is.null(predict_model)) {
+    if(model_class0 %in% supported_models){
+      predict_model <- mcceR::predict_model
+    } else {
+      stop(
+        "You passed a model to explain_mcce() which is not natively supported, and did not supply the 'predict_model' ",
+        "function to explain_mcce().\n",
+      )
+    }
+  }
+
+
+  return(predict_model)
+}
+

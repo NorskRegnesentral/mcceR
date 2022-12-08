@@ -70,7 +70,7 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
     }
 
     current_x <- c(current_x, mutable_features[i])
-    print(i)
+#    print(i)
   }
 
   time_fit = difftime(Sys.time(), time_fit_start, units = "secs")

@@ -1,39 +1,4 @@
----
-output: github_document
----
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
-# mcceR
-
-<!-- badges: start -->
-<!-- badges: end -->
-
-The goal of mcceR is to generate counterfactual explanations 
-
-## Installation
-
-You can install mcceR from GitHub with:
-
-``` r
-remotes::install_github("NorskRegnesentral/mcceR")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(mcceR)
+#library(mcceR)
 library(xgboost)
 ## basic example code
 
@@ -58,6 +23,7 @@ model <- xgboost(
 
 #predict(model,x_train)
 
+
 explained <- explain_mcce(model = model,
                           x_explain = x_explain,
                           x_train = x_train,
@@ -67,4 +33,3 @@ explained <- explain_mcce(model = model,
 
 
 explained$cf
-```
