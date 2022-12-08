@@ -70,7 +70,9 @@ explain_mcce = function(model, x_explain, x_train, predict_model=shapr::predict_
     x_explain <- data.table::as.data.table(x_explain)
   }
 
-
+  if(is.null(predict_model)){
+    predict_model <- mcceR::predict_model
+  }
 
   pred_train <- predict_model(model,x_train)
 
