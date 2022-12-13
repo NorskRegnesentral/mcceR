@@ -43,16 +43,28 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
 
     #  x_train[,decision := decision0]
     data.table::set(x_train, i = NULL, j="decision", value=decision0)
+
+    fixed_features <- c(fixed_features,"decision")
   }
 
-  fixed_features <- c(fixed_features,"decision")
 
-  mutable_features <- names(x_train)[!(names(x_train) %in% fixed_features)]
 
-  N_fixed = length(fixed_features)
+  if(length(fixed_features)==0){
+    x_train[,dummy:=1]
+
+    mutable_features <- names(x_train)[!(names(x_train) %in% "dummy")]
+
+    current_x <- "dummy"
+
+  } else {
+    mutable_features <- names(x_train)[!(names(x_train) %in% fixed_features)]
+
+    current_x <- fixed_features
+  }
+
   N_mutable = length(mutable_features)
 
-  current_x <- fixed_features
+
   model_list <- list()
 
   time_fit_start = Sys.time()

@@ -72,13 +72,13 @@ process = function(x_sim,
 
   x_sim[,row_id:=1:.N]
 
-  res.dt <- data.table::data.table(row_id=seq_len(nrow(x_sim)),id_explain=x_sim[,id_explain])
+  res.dt <- data.table::data.table(row_id=seq_len(nrow(x_sim)),id_explain=x_sim[,id_explain],pred=pred_sim)
 
   measure_ordering <- c()
   for(this_measure in measures){
 
     if(this_measure=="validation"){
-      get_measure_validation(res.dt,x_explain_mutable,x_sim_mutable,pred_sim,c_int)
+      get_measure_validation(res.dt,x_explain_mutable,x_sim_mutable,c_int)
       measure_ordering <- c(measure_ordering,-1)
     }
 
@@ -107,14 +107,14 @@ process = function(x_sim,
     res.dt <- res.dt[measure_validation==1]
   }
 
-  ret_sim0 <- res.dt[,head(.SD,return_best_k),by=id_explain][,.(row_id,counterfactual_rank)]
+  ret_sim0 <- res.dt[,head(.SD,return_best_k),by=id_explain][,.(row_id,counterfactual_rank,pred)]
 
   ret_sim <- x_sim[ret_sim0,on="row_id"]
   ret_sim[,row_id:=NULL]
 
   time_process = difftime(Sys.time(), time_process_start, units = "secs")
 
-  data.table::setcolorder(ret_sim,c("id_explain","counterfactual_rank"))
+  data.table::setcolorder(ret_sim,c("id_explain","counterfactual_rank","pred"))
 
   ret <- list(cf=ret_sim,
               time_process = time_process)
@@ -123,9 +123,8 @@ process = function(x_sim,
 }
 
 
-get_measure_validation <- function(res.dt,x_explain_mutable,x_sim_mutable,pred_sim,c_int){
-  value = (pred_sim>=c_int[1] & pred_sim<=c_int[2])*1
-  res.dt[,measure_validation:= value]
+get_measure_validation <- function(res.dt,x_explain_mutable,x_sim_mutable,c_int){
+  res.dt[,measure_validation:= (pred>=c_int[1] & pred<=c_int[2])*1]
 }
 
 

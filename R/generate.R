@@ -39,11 +39,21 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
     set(x_explain, i = NULL, j="decision", value=1)
   }
 
+  if(length(fixed_features)==0){
+    x_explain[,dummy:=1]
+
+    dup_features <- c("dummy",fixed_features)
+
+  } else {
+    dup_features <- fixed_features
+  }
+
+
   explain_vec <- rep(seq_len(n_explain), each = K)
 
   time_generate_start = Sys.time()
 
-  simData <- x_explain[explain_vec, fixed_features,with=F]
+  simData <- x_explain[explain_vec, dup_features,with=F]
   simData <- data.table::setDT(simData)
 
   rowno <- seq_len(nrow(x_train))
@@ -71,8 +81,13 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
       data.table::set(simData,i = these_rows,j=this_feature, value = tmp)
     }
   }
+
   data.table::setcolorder(simData, neworder = names(x_train))
   data.table::set(simData,j="id_explain", value = explain_vec)
+
+  if(length(fixed_features)==0){
+    simData[,dummy:=NULL]
+  }
 
   if(decision){
     data.table::set(simData, i = NULL, j="decision", value=NULL)
