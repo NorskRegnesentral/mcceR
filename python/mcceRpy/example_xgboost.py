@@ -1,8 +1,6 @@
 from mcceRpy import explain_mcce 
 from mcceRpy import datasets
 
-#### Run python code ####
-
 import xgboost as xgb
 import numpy as np
 
