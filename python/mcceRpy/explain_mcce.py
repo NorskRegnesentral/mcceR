@@ -61,7 +61,7 @@ def explain_mcce(
         The function must have two arguments, `model` and `newdata` which specify, respectively, the model
         and a data.frame/data.table to compute predictions for. The function must give the prediction as a numeric vector.
     fixed_features : Character vector.
-        Names of features to fix in counterfactual generation.
+        Names of features to fix in counterfactual generation. Set to None in order to not fix any features
     c_int : Numeric vector (length 2).
         Contains the data used to train the autoregressive feature dependence model.
     fit.autoregressive_model : Character.
@@ -103,7 +103,7 @@ def explain_mcce(
     rfit_object = mcceR.fit(
         x_train = py2r(x_train),
         pred_train = py2r(pred_train),
-        fixed_features = ro.StrVector(fixed_features),
+        fixed_features = ro.StrVector(maybe_null(fixed_features)),
         c_int = py2r(c_int),
         autoregressive_model  = fit_autoregressive_model,
         decision = fit_decision,
@@ -124,7 +124,7 @@ def explain_mcce(
         pred_sim = py2r(pred_sim),
         x_explain = py2r(x_explain),
         fit_object = rfit_object,
-        measures = ro.StrVector(process_measures), # Don't obey this quite yet
+        measures = ro.StrVector(process_measures), 
         remove_invalid = process_remove_invalid,
         return_best_k = process_return_best_k,
         sort_by_measures_order = process_sort_by_measures_order)
