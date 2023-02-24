@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mcceR
+# mcceR: Monte Carlo sampling of realistic Counterfactual Explanations for tabular data
 
 <!-- badges: start -->
 <!-- badges: end -->
