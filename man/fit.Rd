@@ -11,7 +11,8 @@ fit(
   c_int = c(mean(pred_train), 1),
   autoregressive_model = "ctree",
   seed = NULL,
-  decision = TRUE
+  decision = TRUE,
+  ...
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ If \code{NULL} the seed will be inherited from the calling environment.}
 
 \item{decision}{Logical.
 Whether to include the decision threshold as a binary features to improve the efficiency of MCCE.}
+
+\item{...}{Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}}
 }
 \value{
 List. Includes model_list with the fitted models

@@ -18,7 +18,7 @@
 #'
 #' @export
 #'
-fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1), autoregressive_model="ctree", seed=NULL,decision = TRUE){
+fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1), autoregressive_model="ctree", seed=NULL,decision = TRUE,...){
 
   if(!is.null(seed)) set.seed(seed)
 
@@ -74,9 +74,9 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
     response <- mutable_features[i]
     features <- current_x
     if(autoregressive_model=="ctree"){
-      model_list[[i]] <- model.ctree(response,features,data=x_train)
+      model_list[[i]] <- model.ctree(response,features,data=x_train,...)
     } else if(autoregressive_model=="rpart"){
-      model_list[[i]] <- model.rpart(response,features,data=x_train)
+      model_list[[i]] <- model.rpart(response,features,data=x_train,...)
     } else {
       stop("autoregressive_model argument not recognized.")
     }
@@ -99,16 +99,18 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
 }
 
 
-model.ctree <- function(response,features,data){
+model.ctree <- function(response,features,data,...){
   formula <- as.formula(paste0(response, "~", paste0(features, collapse = "+")))
   mod <- party::ctree(formula = formula,
-                      data = data)
+                      data = data,
+                      ...)
 
 }
 
-model.rpart <- function(response,features,data){
+model.rpart <- function(response,features,data,...){
   formula <- as.formula(paste0(response, "~", paste0(features, collapse = "+")))
   mod <- rpart::rpart(formula = formula,
-                      data = data)
+                      data = data,
+                      ...)
 
 }

@@ -23,13 +23,33 @@ model <- xgboost(
 
 #predict(model,x_train)
 
-
+set.seed(123)
 explained <- explain_mcce(model = model,
                           x_explain = x_explain,
                           x_train = x_train,
                           c_int = c(-Inf,15),
                           predict_model=NULL,
-                          fixed_features = "Wind")
+                          fixed_features = "Wind",
+                          store_model_list = T,
+                          store_sim_data = T)
 
 
 explained$cf
+
+
+
+### Controlling the fit procedure and saving the model and simulated data
+set.seed(123)
+explained <- explain_mcce(model = model,
+                          x_explain = x_explain,
+                          x_train = x_train,
+                          c_int = c(-Inf,15),
+                          predict_model=NULL,
+                          fixed_features = "Wind",
+                          store_model_list = T,
+                          store_sim_data = T,
+                          controls = party::ctree_control(stump = TRUE)) # fit trees with only 1 split for testing purpose
+
+explained$model_list
+explained$sim_data
+

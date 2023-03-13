@@ -8,8 +8,8 @@ explain_mcce(
   model,
   x_explain,
   x_train,
-  predict_model = shapr::predict_model,
-  fixed_features,
+  predict_model = NULL,
+  fixed_features = NULL,
   c_int = c(0.5, 1),
   fit.autoregressive_model = "ctree",
   fit.decision = TRUE,
@@ -19,7 +19,10 @@ explain_mcce(
   process.measures = c("validation", "L0", "L1"),
   process.return_best_k = 1,
   process.remove_invalid = TRUE,
-  process.sort_by_measures_order = TRUE
+  process.sort_by_measures_order = TRUE,
+  store_model_list = FALSE,
+  store_sim_data = FALSE,
+  ...
 )
 }
 \arguments{
@@ -70,9 +73,17 @@ Indicates whether invalid counterfactuals should be removed from the returned co
 
 \item{process.sort_by_measures_order}{Logical.
 Indicates whether the counterfactuals should be sorted.}
+
+\item{store_model_list}{Logical.
+Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.}
+
+\item{store_sim_data}{Logical.
+Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.}
+
+\item{...}{Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}}
 }
 \value{
-List. The counterfactuals for the predictions we explain.
+List. The counterfactuals for the predictions we explain + various supporting info
 }
 \description{
 Fit autoregressive model to the training data

@@ -48,7 +48,15 @@
 #' @param process.sort_by_measures_order Logical.
 #' Indicates whether the counterfactuals should be sorted.
 #'
-#' @return List. The counterfactuals for the predictions we explain.
+#' @param store_model_list Logical.
+#' Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.
+#'
+#' @param store_sim_data Logical.
+#' Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.
+#'
+#' @param ... Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}
+#'
+#' @return List. The counterfactuals for the predictions we explain + various supporting info
 #'
 #' @export
 #'
@@ -56,7 +64,13 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
                         fixed_features = NULL, c_int=c(0.5,1),
                         fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
                         generate.K = 1000, generate.seed = NULL,
-                        process.measures = c("validation","L0","L1"),process.return_best_k = 1, process.remove_invalid = TRUE, process.sort_by_measures_order = TRUE){
+                        process.measures = c("validation","L0","L1"),
+                        process.return_best_k = 1,
+                        process.remove_invalid = TRUE,
+                        process.sort_by_measures_order = TRUE,
+                        store_model_list = FALSE,
+                        store_sim_data = FALSE,
+                        ...){
 
   if (!is.matrix(x_train) && !is.data.frame(x_train)) {
     stop("x_train should be a matrix or a data.frame/data.table.\n")
@@ -81,7 +95,8 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
                     c_int = c_int,
                     autoregressive_model = fit.autoregressive_model,
                     decision = fit.decision,
-                    seed = fit.seed)
+                    seed = fit.seed,
+                    ...)
 
 
 
@@ -112,6 +127,12 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
               mutable_features = fit_object$mutable_features,
               time = time_vec)
 
+  if(store_model_list==TRUE){
+    ret$model_list <- fit_object$model_list
+  }
+  if(store_sim_data==TRUE){
+    ret$sim_data <- x_sim
+  }
 
-
+  return(ret)
 }
