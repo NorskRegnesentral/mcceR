@@ -65,14 +65,18 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
     # Using partykit::as.party(model)
     # See: "https://stackoverflow.com/questions/36748531/getting-the-observations-in-a-rparts-node-i-e-cart"
     predict_node = predict_node.rpart
+  } else if(autoregressive_model=="rpart_new"){
+    #Using a modified version of rpart_leaves from the last answer here:  https://stackoverflow.com/questions/17597739/get-id-name-of-rpart-model-nodes
+    predict_node = predict_node.rpart_new
+
   }
 
   if(!is.null(seed))set.seed(seed)
   for(i in seq_len(N_mutable)){
     this_feature <- mutable_features[i]
 
-    fit.nodes <- predict_node(model=model_list[[i]])
-    pred.nodes <- predict_node(model= model_list[[i]], newdata = simData)
+    fit.nodes <- predict_node(model = model_list[[i]])
+    pred.nodes <- predict_node(model = model_list[[i]], newdata = simData)
     for (pred_node in unique(pred.nodes)){
       these_rows <- which(pred.nodes == pred_node)
 
@@ -110,4 +114,21 @@ predict_node.ctree <- function(model,newdata=NULL){
 predict_node.rpart <- function(model,newdata=NULL){
   predict(object=partykit::as.party(model),newdata=newdata,type="node")
 }
+
+predict_node.rpart_new <- function(model, newdata = NULL) {
+  if(is.null(newdata)){
+    return(model$where)
+  }
+  if (is.null(attr(newdata, "terms"))) {
+    Terms <- delete.response(model$terms)
+    newdata <- model.frame(Terms, newdata, na.action = na.pass,
+                           xlev = attr(model, "xlevels"))
+    if (!is.null(cl <- attr(Terms, "dataClasses")))
+      .checkMFClasses(cl, newdata, TRUE)
+  }
+  newdata <- rpart:::rpart.matrix(newdata)
+  where <- unname(rpart:::pred.rpart(model, newdata))
+  return(where)
+  }
+
 
