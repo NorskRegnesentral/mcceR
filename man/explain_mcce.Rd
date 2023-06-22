@@ -81,6 +81,9 @@ Indicates whether the list of models used to fit the feature distribution should
 \item{store_sim_data}{Logical.
 Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.}
 
+\item{timing}{Logical.
+Whether the timing of the different parts of the \code{explain()} should saved in the model object.}
+
 \item{...}{Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}}
 }
 \value{

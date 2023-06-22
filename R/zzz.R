@@ -14,7 +14,14 @@
       "measure_validation",
       "measure_sparsity",
       "row_id",
-      "counterfactual_rank"
+      "counterfactual_rank",
+      "get_measure_L0",
+      "get_measure_L1",
+      "get_measure_L2",
+      "get_measure_validation",
+      "get_predict_model",
+      "predict_node.rpart",
+      "pred"
     )
   )
   invisible()
