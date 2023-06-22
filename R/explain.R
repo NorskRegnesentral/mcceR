@@ -70,6 +70,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
                         process.sort_by_measures_order = TRUE,
                         store_model_list = FALSE,
                         store_sim_data = FALSE,
+                        timing = TRUE,
                         ...){
 
   if (!is.matrix(x_train) && !is.data.frame(x_train)) {
@@ -133,6 +134,12 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
   if(store_sim_data==TRUE){
     ret$sim_data <- x_sim
   }
+  if (timing == FALSE) {
+    ret$time <- NULL
+  }
+
+
+  attr(ret, "class") <- c("mcce", "list")
 
   return(ret)
 }

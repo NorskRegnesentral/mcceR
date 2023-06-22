@@ -22,6 +22,7 @@ explain_mcce(
   process.sort_by_measures_order = TRUE,
   store_model_list = FALSE,
   store_sim_data = FALSE,
+  timing = TRUE,
   ...
 )
 }
