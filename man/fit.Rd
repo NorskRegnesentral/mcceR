@@ -29,6 +29,12 @@ Names of features to fix in counterfactual generation.}
 \item{c_int}{Numeric vector (length 2).
 Specifies the range of prediction values corresponding to the desired decision}
 
+\item{featuremodel_object}{List.
+Contains the models used to fit the feature distribution from a previous call to \code{explain_mcce()},
+with the same \code{model} (and features), \code{fixed_features} and \code{c_int}.
+Once passed, these models are used to resemble the data distribution (and \code{x_train} is ignored).
+\code{NULL} (default) means new featuremodels are fitted based on \code{x_train}.}
+
 \item{autoregressive_model}{Character.
 Specifies the name of the autoregressive model used to fit the data.}
 

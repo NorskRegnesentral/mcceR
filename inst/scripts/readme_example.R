@@ -30,8 +30,8 @@ explained <- explain_mcce(model = model,
                           c_int = c(-Inf,15),
                           predict_model=NULL,
                           fixed_features = "Wind",
-                          store_model_list = T,
-                          store_sim_data = T)
+                          return_featuremodel_object = T,
+                          return_sim_data = T)
 
 
 explained$cf
@@ -46,8 +46,8 @@ explained <- explain_mcce(model = model,
                           c_int = c(-Inf,15),
                           predict_model=NULL,
                           fixed_features = "Wind",
-                          store_model_list = T,
-                          store_sim_data = T,
+                          return_featuremodel_object = T,
+                          return_sim_data = T,
                           controls = party::ctree_control(stump = TRUE)) # fit trees with only 1 split for testing purpose
 
 explained$model_list

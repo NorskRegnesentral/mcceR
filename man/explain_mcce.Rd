@@ -47,6 +47,12 @@ Names of features to fix in counterfactual generation.}
 \item{c_int}{Numeric vector (length 2).
 Specifies the range of prediction values corresponding to the desired decision}
 
+\item{featuremodel_object}{List.
+Contains the models used to fit the feature distribution from a previous call to \code{explain_mcce()},
+with the same \code{model} (and features), \code{fixed_features} and \code{c_int}.
+Once passed, these models are used to resemble the data distribution (and \code{x_train} is ignored).
+\code{NULL} (default) means new featuremodels are fitted based on \code{x_train}.}
+
 \item{fit.autoregressive_model}{Character.
 Specifies the name of the autoregressive model used to fit the data.}
 
@@ -76,6 +82,9 @@ Indicates whether invalid counterfactuals should be removed from the returned co
 \item{process.sort_by_measures_order}{Logical.
 Indicates whether the counterfactuals should be sorted.}
 
+\item{return_featuremodel_object}{Logical.
+Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.}
+
 \item{return_sim_data}{Logical.
 Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.}
 
@@ -84,15 +93,6 @@ Whether the timing of the different parts of the \code{explain()} should saved i
 
 \item{...}{Additional arguments passed to \code{\link[party:ctree]{party::ctree()}} or
 \code{\link[rpart:rpart]{rpart::rpart()}}}
-
-\item{featuremodel_list}{List.
-Contains the models used to fit the feature distribution from a previous call to \code{explain_mcce()},
-with the same \code{model} (and features), \code{fixed_features} and \code{c_int}.
-Once passed, these models are used to resemble the data distribution (and \code{x_train} is ignored).
-\code{NULL} (default) means new featuremodels are fitted based on \code{x_train}.}
-
-\item{return_featuremodel_list}{Logical.
-Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.}
 }
 \value{
 List. The counterfactuals for the predictions we explain + various supporting info

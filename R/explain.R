@@ -13,7 +13,7 @@
 #' The function must have two arguments, `model` and `newdata` which specify, respectively, the model
 #' and a data.frame/data.table to compute predictions for. The function must give the prediction as a numeric vector.
 #'
-#' @param featuremodel_list List.
+#' @param featuremodel_object List.
 #' Contains the models used to fit the feature distribution from a previous call to `explain_mcce()`,
 #' with the same `model` (and features), `fixed_features` and `c_int`.
 #' Once passed, these models are used to resemble the data distribution (and `x_train` is ignored).
@@ -54,7 +54,7 @@
 #' @param process.sort_by_measures_order Logical.
 #' Indicates whether the counterfactuals should be sorted.
 #'
-#' @param return_featuremodel_list Logical.
+#' @param return_featuremodel_object Logical.
 #' Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.
 #'
 #' @param return_sim_data Logical.
