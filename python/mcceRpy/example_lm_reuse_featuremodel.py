@@ -50,3 +50,29 @@ cf_lm["cf"].equals(cf_lm2["cf"])
 
 
 
+### Also showing that it works saving the featuremodel_Robject to file and reading it in again to be used
+import pickle
+
+# Save the object to disk
+with open('tmp_featuremodel_Robject.pkl', 'wb') as file:
+    pickle.dump(cf_lm["featuremodel_Robject"], file)
+
+# Read the object from disk
+with open('tmp_featuremodel_Robject.pkl', 'rb') as file:
+    loaded_featuremodel_Robject = pickle.load(file)
+
+cf_lm3 = explain_mcce.explain_mcce(
+    model = model,
+    x_explain = dfx_test,
+    x_train = dfx_train,
+    predict_model = lm_predict_model, 
+    featuremodel_Robject = loaded_featuremodel_Robject,
+    fixed_features = ["HouseAge"],
+    c_int=np.array([3,1000]),
+    fit_seed=123,generate_seed=123,
+    return_featuremodel_Robject = True)
+
+cf_lm3["cf"]
+
+# Identical results
+cf_lm["cf"].equals(cf_lm3["cf"])
