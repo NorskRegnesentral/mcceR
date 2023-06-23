@@ -24,7 +24,7 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
   fixed_features <- fit_object$fixed_features
   decision <- fit_object$decision
   x_train <- fit_object$x_train
-  model_list <- fit_object$model_list
+  featuremodel_list <- fit_object$featuremodel_list
   autoregressive_model <- fit_object$autoregressive_model
   n_explain <- nrow(x_explain)
 
@@ -69,8 +69,8 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
   for(i in seq_len(N_mutable)){
     this_feature <- mutable_features[i]
 
-    fit.nodes <- predict_node(model = model_list[[i]])
-    pred.nodes <- predict_node(model = model_list[[i]], newdata = simData)
+    fit.nodes <- predict_node(model = featuremodel_list[[i]])
+    pred.nodes <- predict_node(model = featuremodel_list[[i]], newdata = simData)
     for (pred_node in unique(pred.nodes)){
       these_rows <- which(pred.nodes == pred_node)
 

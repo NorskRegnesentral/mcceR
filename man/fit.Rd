@@ -9,6 +9,7 @@ fit(
   pred_train,
   fixed_features,
   c_int = c(mean(pred_train), 1),
+  featuremodel_object = NULL,
   autoregressive_model = "ctree",
   seed = NULL,
   decision = TRUE,
@@ -42,7 +43,7 @@ Whether to include the decision threshold as a binary features to improve the ef
 \code{\link[rpart:rpart]{rpart::rpart()}}}
 }
 \value{
-List. Includes model_list with the fitted models
+List. Includes featuremodel_list with the fitted models
 }
 \description{
 Fit autoregressive model to the training data
