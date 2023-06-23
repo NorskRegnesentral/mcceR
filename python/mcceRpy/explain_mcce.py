@@ -44,8 +44,11 @@ def explain_mcce(
     c_int = np.array([0.5,1]),
     fit_autoregressive_model="ctree", fit_decision = True, fit_seed = None,
     generate_K = 1000, generate_seed = None,
-    process_measures = ["validation","L0","L1"], process_return_best_k = 1, 
-    process_remove_invalid = True, process_sort_by_measures_order = True):
+    process_measures = ["validation","L0","L1"],
+    process_return_best_k = 1, 
+    process_remove_invalid = True,
+    process_sort_by_measures_order = True,
+    return_featuremodel_Robject = False):
       
     """Explain predictions with Monte Carlo Counterfactual Explanations (MCCE) 
 
@@ -84,6 +87,9 @@ def explain_mcce(
         Indicates whether invalid counterfactuals should be removed from the returned counterfactual list.
     process.sort_by_measures_order : Logical.
         Indicates whether the counterfactuals should be sorted.
+    return_featuremodel_Robject : Logical.
+        Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.
+
     Returns
     -------
     cf
@@ -137,5 +143,8 @@ def explain_mcce(
     ret = {"cf": r2py(rcfs.rx2('cf')),
           "fixed_features": r2py(rfit_object.rx2('fixed_features')),
           "time": time_vec} 
+
+    if return_featuremodel_Robject is True:
+       ret["featuremodel_Robject"] = rfit_object
           
     return ret
