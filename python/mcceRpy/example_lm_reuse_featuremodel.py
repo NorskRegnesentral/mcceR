@@ -29,4 +29,24 @@ cf_lm = explain_mcce.explain_mcce(
     fit_seed=123,generate_seed=123,
     return_featuremodel_Robject = True)
 
-cf_lm
+cf_lm["cf"]
+
+cf_lm2 = explain_mcce.explain_mcce(
+    model = model,
+    x_explain = dfx_test,
+    x_train = dfx_train,
+    predict_model = lm_predict_model, 
+    featuremodel_Robject = cf_lm["featuremodel_Robject"],
+    fixed_features = ["HouseAge"],
+    c_int=np.array([3,1000]),
+    fit_seed=123,generate_seed=123,
+    return_featuremodel_Robject = True)
+
+cf_lm2["cf"]
+
+# Identical results
+cf_lm["cf"].equals(cf_lm2["cf"])
+# True
+
+
+
