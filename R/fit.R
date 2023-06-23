@@ -14,11 +14,17 @@
 #'
 #' @inheritParams explain_mcce
 #'
-#' @return List. Includes model_list with the fitted models
+#' @return List. Includes featuremodel_list with the fitted models
 #'
 #' @export
 #'
-fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1), autoregressive_model="ctree", seed=NULL,decision = TRUE,...){
+fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),featuremodel_object = NULL,
+               autoregressive_model="ctree", seed=NULL,decision = TRUE,...){
+
+  if(!is.null(featuremodel_object)){
+    featuremodel_object$time_fit <- as.difftime(0,units = "secs")
+    return(featuremodel_object)
+  }
 
   if(!is.null(seed)) set.seed(seed)
 
@@ -65,7 +71,7 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
   N_mutable = length(mutable_features)
 
 
-  model_list <- list()
+  featuremodel_list <- list()
 
   time_fit_start = Sys.time()
   # Fit the models
@@ -74,9 +80,9 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
     response <- mutable_features[i]
     features <- current_x
     if(autoregressive_model=="ctree"){
-      model_list[[i]] <- model.ctree(response,features,data=x_train,...)
+      featuremodel_list[[i]] <- model.ctree(response,features,data=x_train,...)
     } else if(autoregressive_model%in% c("rpart")){
-      model_list[[i]] <- model.rpart(response,features,data=x_train,...)
+      featuremodel_list[[i]] <- model.rpart(response,features,data=x_train,...)
     } else {
       stop("autoregressive_model argument not recognized.")
     }
@@ -86,7 +92,7 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
   }
 
   time_fit = difftime(Sys.time(), time_fit_start, units = "secs")
-  ret <- list(model_list = model_list,
+  ret <- list(featuremodel_list = featuremodel_list,
               time_fit = time_fit,
               fixed_features = fixed_features,
               mutable_features = mutable_features,

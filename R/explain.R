@@ -13,6 +13,12 @@
 #' The function must have two arguments, `model` and `newdata` which specify, respectively, the model
 #' and a data.frame/data.table to compute predictions for. The function must give the prediction as a numeric vector.
 #'
+#' @param featuremodel_object List.
+#' Contains the models used to fit the feature distribution from a previous call to `explain_mcce()`,
+#' with the same `model` (and features), `fixed_features` and `c_int`.
+#' Once passed, these models are used to resemble the data distribution (and `x_train` is ignored).
+#' `NULL` (default) means new featuremodels are fitted based on `x_train`.
+#'
 #' @param fixed_features Character vector.
 #' Names of features to fix in counterfactual generation.
 #'
@@ -48,10 +54,10 @@
 #' @param process.sort_by_measures_order Logical.
 #' Indicates whether the counterfactuals should be sorted.
 #'
-#' @param store_model_list Logical.
+#' @param return_featuremodel_object Logical.
 #' Indicates whether the list of models used to fit the feature distribution should be stored and returned to the user.
 #'
-#' @param store_sim_data Logical.
+#' @param return_sim_data Logical.
 #' Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.
 #'
 #' @param timing Logical.
@@ -66,24 +72,19 @@
 #'
 explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
                         fixed_features = NULL, c_int=c(0.5,1),
+                        featuremodel_object = NULL,
                         fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
                         generate.K = 1000, generate.seed = NULL,
                         process.measures = c("validation","L0","L1"),
                         process.return_best_k = 1,
                         process.remove_invalid = TRUE,
                         process.sort_by_measures_order = TRUE,
-                        store_model_list = FALSE,
-                        store_sim_data = FALSE,
+                        return_featuremodel_object = FALSE,
+                        return_sim_data = FALSE,
                         timing = TRUE,
                         ...){
 
-  if (!is.matrix(x_train) && !is.data.frame(x_train)) {
-    stop("x_train should be a matrix or a data.frame/data.table.\n")
-  } else {
-    x_train <- data.table::as.data.table(x_train)
-  }
-
-  if (!is.matrix(x_explain) && !is.data.frame(x_explain)) {
+  if (!(is.matrix(x_explain) || is.data.frame(x_explain))) {
     stop("x_explain should be a matrix or a data.frame/data.table.\n")
   } else {
     x_explain <- data.table::as.data.table(x_explain)
@@ -91,13 +92,28 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
 
   predict_model <- get_predict_model(predict_model, model)
 
+  if(is.null(featuremodel_object)){
+    if (! (is.matrix(x_train) || is.data.frame(x_train))) {
+      stop("x_train should be a matrix or a data.frame/data.table, or 'featuremodel_object' must be passed\n")
+    } else {
+      x_train <- data.table::as.data.table(x_train)
+    }
 
-  pred_train <- predict_model(model,x_train)
+    pred_train <- predict_model(model,x_train)
+
+  } else { # If featuremodel_object is passed with don't need the prediction on the training data set
+    pred_train <- NULL
+  }
+
+
+
+
 
   fit_object <- fit(x_train = x_train,
                     pred_train = pred_train,
                     fixed_features = fixed_features,
                     c_int = c_int,
+                    featuremodel_object = featuremodel_object,
                     autoregressive_model = fit.autoregressive_model,
                     decision = fit.decision,
                     seed = fit.seed,
@@ -132,10 +148,11 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
               mutable_features = fit_object$mutable_features,
               time = time_vec)
 
-  if(store_model_list==TRUE){
-    ret$model_list <- fit_object$model_list
+  if(return_featuremodel_object==TRUE){
+    fit_object$time_fit <- NULL # Removed
+    ret$featuremodel_object <- fit_object
   }
-  if(store_sim_data==TRUE){
+  if(return_sim_data==TRUE){
     ret$sim_data <- x_sim
   }
   if (timing == FALSE) {

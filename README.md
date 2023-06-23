@@ -57,13 +57,12 @@ explained <- explain_mcce(model = model,
                           fit.seed = 123,
                           generate.seed = 123)
 
-
-explained$cf
-#>    id_explain counterfactual_rank     pred Solar.R Wind Temp Month
-#> 1:          1                   1 14.23223      49  7.4   76     6
-#> 2:          2                   1 14.89603      49  8.0   70     9
-#> 3:          3                   1 14.35841     191 12.6   73     7
-#> 4:          4                   1 14.58602     334 11.5   64     7
-#> 5:          5                   1 14.46724      49  8.6   76     7
-#> 6:          6                   1 14.39142      78 13.8   64     7
+explained
+#>    id_explain counterfactual_rank  pred Solar.R Wind Temp Month
+#> 1:          1                   1 14.23      49  7.4   76     6
+#> 2:          2                   1 14.90      49  8.0   70     9
+#> 3:          3                   1 14.36     191 12.6   73     7
+#> 4:          4                   1 14.59     334 11.5   64     7
+#> 5:          5                   1 14.47      49  8.6   76     7
+#> 6:          6                   1 14.39      78 13.8   64     7
 ```

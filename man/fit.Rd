@@ -9,6 +9,7 @@ fit(
   pred_train,
   fixed_features,
   c_int = c(mean(pred_train), 1),
+  featuremodel_object = NULL,
   autoregressive_model = "ctree",
   seed = NULL,
   decision = TRUE,
@@ -28,6 +29,12 @@ Names of features to fix in counterfactual generation.}
 \item{c_int}{Numeric vector (length 2).
 Specifies the range of prediction values corresponding to the desired decision}
 
+\item{featuremodel_object}{List.
+Contains the models used to fit the feature distribution from a previous call to \code{explain_mcce()},
+with the same \code{model} (and features), \code{fixed_features} and \code{c_int}.
+Once passed, these models are used to resemble the data distribution (and \code{x_train} is ignored).
+\code{NULL} (default) means new featuremodels are fitted based on \code{x_train}.}
+
 \item{autoregressive_model}{Character.
 Specifies the name of the autoregressive model used to fit the data.}
 
@@ -42,7 +49,7 @@ Whether to include the decision threshold as a binary features to improve the ef
 \code{\link[rpart:rpart]{rpart::rpart()}}}
 }
 \value{
-List. Includes model_list with the fitted models
+List. Includes featuremodel_list with the fitted models
 }
 \description{
 Fit autoregressive model to the training data

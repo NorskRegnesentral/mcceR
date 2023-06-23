@@ -68,6 +68,5 @@ explained <- explain_mcce(model = model,
                           fit.seed = 123,
                           generate.seed = 123)
 
-
-explained$cf
+explained
 ```

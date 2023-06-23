@@ -52,18 +52,12 @@ process = function(x_sim,
 
 
   mutable_features <- fit_object$mutable_features
-  fixed_features <- fit_object$fixed_features
-  decision <- fit_object$decision
-  x_train <- fit_object$x_train
-  model_list <- fit_object$model_list
-  autoregressive_model <- fit_object$autoregressive_model
   c_int <- fit_object$c_int
 
   time_process_start = Sys.time()
 
   n_explain <- nrow(x_explain)
 
-#  mutable_features <- c(mutable_features,fixed_features[-29])
 
   mutable_features_plus <- c("id_explain",mutable_features)
 
