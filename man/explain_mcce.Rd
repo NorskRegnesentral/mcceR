@@ -22,6 +22,7 @@ explain_mcce(
   process.sort_by_measures_order = TRUE,
   store_model_list = FALSE,
   store_sim_data = FALSE,
+  timing = TRUE,
   ...
 )
 }
@@ -80,7 +81,11 @@ Indicates whether the list of models used to fit the feature distribution should
 \item{store_sim_data}{Logical.
 Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.}
 
-\item{...}{Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}}
+\item{timing}{Logical.
+Whether the timing of the different parts of the \code{explain()} should saved in the model object.}
+
+\item{...}{Additional arguments passed to \code{\link[party:ctree]{party::ctree()}} or
+\code{\link[rpart:rpart]{rpart::rpart()}}}
 }
 \value{
 List. The counterfactuals for the predictions we explain + various supporting info

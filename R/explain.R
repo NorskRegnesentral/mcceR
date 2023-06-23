@@ -54,7 +54,11 @@
 #' @param store_sim_data Logical.
 #' Indicates whether the simulated data (before any pre-processing) should be stored and returned to the user.
 #'
-#' @param ... Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}
+#' @param timing Logical.
+#' Whether the timing of the different parts of the `explain()` should saved in the model object.
+#'
+#' @param ... Additional arguments passed to \code{\link[party:ctree]{party::ctree()}} or
+#' \code{\link[rpart:rpart]{rpart::rpart()}}
 #'
 #' @return List. The counterfactuals for the predictions we explain + various supporting info
 #'
@@ -70,6 +74,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
                         process.sort_by_measures_order = TRUE,
                         store_model_list = FALSE,
                         store_sim_data = FALSE,
+                        timing = TRUE,
                         ...){
 
   if (!is.matrix(x_train) && !is.data.frame(x_train)) {
@@ -133,6 +138,12 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
   if(store_sim_data==TRUE){
     ret$sim_data <- x_sim
   }
+  if (timing == FALSE) {
+    ret$time <- NULL
+  }
+
+
+  attr(ret, "class") <- c("mcce", "list")
 
   return(ret)
 }

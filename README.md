@@ -1,9 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mcceR: Monte Carlo sampling of realistic Counterfactual Explanations for tabular data
+# mcceR
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/NorskRegnesentral/mcceR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NorskRegnesentral/mcceR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of mcceR is to generate counterfactual explanations
@@ -57,11 +59,11 @@ explained <- explain_mcce(model = model,
 
 
 explained$cf
-#>    id_explain counterfactual_rank Solar.R Wind Temp Month
-#> 1:          1                   1      49  7.4   76     6
-#> 2:          2                   1      49  8.0   70     9
-#> 3:          3                   1     191 12.6   73     7
-#> 4:          4                   1     334 11.5   64     7
-#> 5:          5                   1      49  8.6   76     7
-#> 6:          6                   1      78 13.8   64     7
+#>    id_explain counterfactual_rank     pred Solar.R Wind Temp Month
+#> 1:          1                   1 14.23223      49  7.4   76     6
+#> 2:          2                   1 14.89603      49  8.0   70     9
+#> 3:          3                   1 14.35841     191 12.6   73     7
+#> 4:          4                   1 14.58602     334 11.5   64     7
+#> 5:          5                   1 14.46724      49  8.6   76     7
+#> 6:          6                   1 14.39142      78 13.8   64     7
 ```

@@ -4,12 +4,23 @@
 \name{mcceR-package}
 \alias{mcceR}
 \alias{mcceR-package}
-\title{mcceR: What the Package Does (One Line, Title Case)}
+\title{mcceR: Monte Carlo sampling of realistic Counterfactual Explanations for tabular data}
 \description{
-What the package does (one paragraph).
+mcceR generate counterfactual explanations for any tabular data model using the method described in Redelmeier, A., Jullum, M., Aas, K. and Løland, A. (2021) \href{https://arxiv.org/abs/2111.09790}{arXiv:2111.09790}. A Python wrapper (mcceRpy) is also available to explain models fitted in Python.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Martin Jullum \email{Martin.Jullum@nr.no} (\href{https://orcid.org/0000-0003-3908-5155}{ORCID})
+
+Authors:
+\itemize{
+  \item Annabelle Redelmeier \email{Annabelle.Redelmeier@nr.no}
+}
+
+Other contributors:
+\itemize{
+  \item Anders Løland \email{Anders.Loland@nr.no} [contributor]
+  \item Norsk Regnesentral [copyright holder, funder]
+}
 
 }
 \keyword{internal}

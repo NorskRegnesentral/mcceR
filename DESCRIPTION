@@ -1,22 +1,30 @@
 Package: mcceR
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Title:  Monte Carlo sampling of realistic Counterfactual Explanations for tabular data
+Version: 0.0.1.9000
+Authors@R: c(
+    person("Martin", "Jullum", email = "Martin.Jullum@nr.no", role = c("cre", "aut"), comment = c(ORCID = "0000-0003-3908-5155")),
+    person("Annabelle", "Redelmeier", email = "Annabelle.Redelmeier@nr.no", role = "aut"),
+    person("Anders", "Løland", email = "Anders.Loland@nr.no", role = "ctb"), 
+    person("Norsk Regnesentral", role =  c("cph", "fnd"))
+    )
+Description: mcceR generate counterfactual explanations for any tabular data model using the method described in 
+  Redelmeier, A., Jullum, M., Aas, K. and Løland, A. (2021) <arXiv:2111.09790>.
+  A Python wrapper (mcceRpy) is also available to explain models fitted in Python.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Config/testthat/edition: 3
+Depends: R (>= 3.5.0)
 Imports: 
     data.table,
     Rfast
 Suggests:
     rpart,
     party,
-    partykit
+    partykit,
+    testthat (>= 3.0.0),
+    ranger,
+    mgcv,
+    xgboost
