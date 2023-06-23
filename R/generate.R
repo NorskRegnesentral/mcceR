@@ -106,7 +106,8 @@ predict_node.ctree <- function(model,newdata=NULL){
 
 predict_node.rpart <- function(model,newdata=NULL,version = "new"){
   if(version=="new"){
-    #Using a modified version of rpart_leaves from the last answer here:  https://stackoverflow.com/questions/17597739/get-id-name-of-rpart-model-nodes
+    # Using a modified version of rpart_leaves from the last answer here:  https://stackoverflow.com/questions/17597739/get-id-name-of-rpart-model-nodes
+    # with getFromNamespace instead of ::: to avoid CRAN notes
     if(is.null(newdata)){
       return(model$where)
     }
@@ -117,8 +118,8 @@ predict_node.rpart <- function(model,newdata=NULL,version = "new"){
       if (!is.null(cl <- attr(Terms, "dataClasses")))
         .checkMFClasses(cl, newdata, TRUE)
     }
-    newdata <- rpart:::rpart.matrix(newdata)
-    where <- unname(rpart:::pred.rpart(model, newdata))
+    newdata <- getFromNamespace("rpart.matrix", ns = "rpart")(newdata)
+    where <- unname(getFromNamespace("pred.rpart", ns = "rpart")(model, newdata))
     return(where)
   } else {
     # Using partykit::as.party(model)
