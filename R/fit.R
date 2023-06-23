@@ -98,7 +98,7 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
   return(ret)
 }
 
-
+#' @keywords internal
 model.ctree <- function(response,features,data,...){
   formula <- as.formula(paste0(response, "~", paste0(features, collapse = "+")))
   mod <- party::ctree(formula = formula,
@@ -107,6 +107,7 @@ model.ctree <- function(response,features,data,...){
 
 }
 
+#' @keywords internal
 model.rpart <- function(response,features,data,...){
   formula <- as.formula(paste0(response, "~", paste0(features, collapse = "+")))
   mod <- rpart::rpart(formula = formula,

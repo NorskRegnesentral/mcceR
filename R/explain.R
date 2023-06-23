@@ -57,7 +57,8 @@
 #' @param timing Logical.
 #' Whether the timing of the different parts of the `explain()` should saved in the model object.
 #'
-#' @param ... Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}
+#' @param ... Additional arguments passed to \code{\link[party:ctree]{party::ctree()}} or
+#' \code{\link[rpart:rpart]{rpart::rpart()}}
 #'
 #' @return List. The counterfactuals for the predictions we explain + various supporting info
 #'

@@ -84,7 +84,8 @@ Indicates whether the simulated data (before any pre-processing) should be store
 \item{timing}{Logical.
 Whether the timing of the different parts of the \code{explain()} should saved in the model object.}
 
-\item{...}{Additional arguments passed to \code{\link{party::ctree}} or \code{\link{rpart::rpart}}}
+\item{...}{Additional arguments passed to \code{\link[party:ctree]{party::ctree()}} or
+\code{\link[rpart:rpart]{rpart::rpart()}}}
 }
 \value{
 List. The counterfactuals for the predictions we explain + various supporting info
