@@ -192,7 +192,7 @@ get_measure_gower <- function(res.dt, x_explain_mutable, x_sim_mutable) {
       col1 <- unlist(combined[, num_cols[i], with = FALSE])
       col2 <- unlist(combined[, paste0("i.", num_cols[i]), with = FALSE])
 
-      num_contrib <- num_contrib + abs(col1 - col2) / range(col2) # Using the range of the syntehtic data instead of the original for simplicity
+      num_contrib <- num_contrib + abs(col1 - col2) / diff(range(col2)) # Using the range of the syntehtic data instead of the original for simplicity
     }
   }
   res.dt[, measure_gower := cat_contrib + num_contrib]
