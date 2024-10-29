@@ -129,6 +129,35 @@ get_measure_L0 <- function(res.dt,x_explain_mutable,x_sim_mutable){
     res.dt[id_explain==i,measure_L0:=value]
   }
 }
+
+get_measure_L0_new <- function(res.dt,x_explain_mutable,x_sim_mutable){
+  n_explain <- x_explain_mutable[,.N]
+  for (i in seq_len(n_explain)){
+    org <- x_explain_mutable[id_explain==i,-"id_explain"]
+    sim <- x_sim_mutable[id_explain==i,-"id_explain"]
+    value <- apply(X = sim,FUN=function(x) sum(x == org),MARGIN = 1)
+
+    res.dt[id_explain==i,measure_L0:=value]
+  }
+}
+
+get_measure_L0_new2 <- function(res.dt,x_explain_mutable,x_sim_mutable){
+
+  combined <- x_explain_mutable[x_sim_mutable, on = "id_explain", nomatch = 0]
+
+  # Identify columns to compare (exclude `id_explain`)
+  columns_to_compare <- setdiff(names(x_explain_mutable), "id_explain")
+
+  # Calculate the number of identical values in each row
+  value <- combined[, rowSums(mapply(function(col1, col2) col1 == col2,
+                                     .SD[, columns_to_compare, with = FALSE],
+                                     .SD[, paste0("i.",columns_to_compare), with = FALSE]))]
+
+  res.dt[,measure_L0 := value]
+}
+
+
+
 get_measure_L1 <- function(res.dt,x_explain_mutable,x_sim_mutable){
   n_explain <- x_explain_mutable[,.N]
   for (i in seq_len(n_explain)){
