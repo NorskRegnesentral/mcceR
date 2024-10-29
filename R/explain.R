@@ -144,6 +144,7 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
                 process.time=cfs$time_process)
 
   ret <- list(cf = cfs$cf[],
+              cf_measures = cfs$cf_measures[],
               fixed_features = fit_object$fixed_features,
               mutable_features = fit_object$mutable_features,
               time = time_vec)

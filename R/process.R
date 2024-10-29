@@ -88,7 +88,10 @@ process = function(x_sim,
       get_measure_L2(res.dt,x_explain_mutable,x_sim_mutable)
       measure_ordering <- c(measure_ordering,1)
     }
-
+    if(this_measure=="gower"){
+      get_measure_gower(res.dt,x_explain_mutable,x_sim_mutable)
+      measure_ordering <- c(measure_ordering,1)
+    }
   }
 
 
@@ -101,19 +104,22 @@ process = function(x_sim,
     res.dt <- res.dt[measure_validation==1]
   }
 
-  cols <- c("row_id","counterfactual_rank","pred",paste0("measure_",measures))
+  cols <- c("counterfactual_rank","row_id","pred",paste0("measure_",measures))
 
   ret_sim0 <- res.dt[,head(.SD,return_best_k),by=id_explain][,cols,with = FALSE]
 
   ret_sim <- x_sim[ret_sim0,on="row_id"]
-  ret_sim[,row_id:=NULL]
 
   time_process = difftime(Sys.time(), time_process_start, units = "secs")
 
-  data.table::setcolorder(ret_sim,cols[-1])
 
-  ret <- list(cf=ret_sim[,-cols[-1],with = FALSE],
-              cf_measures = ret_sim[,cols[-1],with = FALSE],
+  data.table::setcolorder(ret_sim,c("id_explain",cols[-2]))
+
+  cols_measure <- c("id_explain",cols[-2])
+  cols_cf <- names(ret_sim)[!(names(ret_sim) %in% cols[-1])]
+
+  ret <- list(cf=ret_sim[,cols_cf,with = FALSE],
+              cf_measures = ret_sim[,cols_measure,with = FALSE],
               time_process = time_process)
 
   return(ret)
@@ -133,13 +139,19 @@ get_measure_L0 <- function(res.dt,x_explain_mutable,x_sim_mutable){
   # Identify columns to compare (exclude `id_explain`)
   columns_to_compare <- setdiff(names(x_explain_mutable), "id_explain")
 
+  value <- identical_rows(combined,columns_to_compare)
+
+  res.dt[,measure_L0 := n_features-value] # Number of features changed from original value
+}
+
+identical_rows <- function(combined,columns_to_compare){
+
   # Calculate the number of identical values in each row
   value <- combined[, rowSums(mapply(function(col1, col2) col1 == col2,
                                      .SD[, columns_to_compare, with = FALSE],
                                      .SD[, paste0("i.",columns_to_compare), with = FALSE]))]
-
-  res.dt[,measure_L0 := n_features-value] # Number of features changed from original value
 }
+
 
 
 get_measure_L1 <- function(res.dt,x_explain_mutable,x_sim_mutable){
@@ -158,6 +170,31 @@ get_measure_L2 <- function(res.dt,x_explain_mutable,x_sim_mutable){
     res.dt[id_explain==i,measure_L2:=value]
 #    set(res.dt,i=which(res.dt$id_explain==i),j="measure_euclidean",value = Rfast::dista(x_explain_mutable[id_explain==i,-1],x_sim_mutable[id_explain==i,-1],trans=F))
   }
+}
+
+
+get_measure_gower <- function(res.dt,x_explain_mutable,x_sim_mutable){
+
+  cat_cols <- names(which(sapply(x_explain_mutable[,-1],is.factor)))
+  num_cols <- names(which(sapply(x_explain_mutable[,-1],is.numeric)))
+
+  combined <- x_explain_mutable[x_sim_mutable, on = "id_explain", nomatch = 0]
+
+  if(length(cat_cols)>0){
+    cat_contrib <- identical_rows(combined,cat_cols)
+  } else {
+    cat_contrib <- 0
+  }
+  num_contrib <- 0
+  if(length(num_cols)>0){
+    for(i in seq_along(num_cols)){
+      col1 <- unlist(combined[,num_cols[i],with=FALSE])
+      col2 <- unlist(combined[,paste0("i.",num_cols[i]),with=FALSE])
+
+      num_contrib <- num_contrib + abs(col1-col2)/range(col2) # Using the range of the syntehtic data instead of the original for simplicity
+    }
+  }
+  res.dt[,measure_gower:=cat_contrib + num_contrib]
 }
 
 
