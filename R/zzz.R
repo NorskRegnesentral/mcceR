@@ -1,5 +1,4 @@
 .onLoad <- function(libname = find.package("mcceR"), pkgname = "mcceR") {
-
   # CRAN Note avoidance
   utils::globalVariables(
     c(
@@ -22,7 +21,8 @@
       "dummy",
       "get_predict_model",
       "predict_node.rpart",
-      "pred"
+      "pred",
+      "measure_gower"
     )
   )
   invisible()

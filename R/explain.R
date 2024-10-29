@@ -70,20 +70,19 @@
 #'
 #' @export
 #'
-explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
-                        fixed_features = NULL, c_int=c(0.5,1),
-                        featuremodel_object = NULL,
-                        fit.autoregressive_model="ctree", fit.decision = TRUE, fit.seed = NULL,
-                        generate.K = 1000, generate.seed = NULL,
-                        process.measures = c("validation","L0","L1"),
-                        process.return_best_k = 1,
-                        process.remove_invalid = TRUE,
-                        process.sort_by_measures_order = TRUE,
-                        return_featuremodel_object = FALSE,
-                        return_sim_data = FALSE,
-                        timing = TRUE,
-                        ...){
-
+explain_mcce <- function(model, x_explain, x_train, predict_model = NULL,
+                         fixed_features = NULL, c_int = c(0.5, 1),
+                         featuremodel_object = NULL,
+                         fit.autoregressive_model = "ctree", fit.decision = TRUE, fit.seed = NULL,
+                         generate.K = 1000, generate.seed = NULL,
+                         process.measures = c("validation", "L0", "L1"),
+                         process.return_best_k = 1,
+                         process.remove_invalid = TRUE,
+                         process.sort_by_measures_order = TRUE,
+                         return_featuremodel_object = FALSE,
+                         return_sim_data = FALSE,
+                         timing = TRUE,
+                         ...) {
   if (!(is.matrix(x_explain) || is.data.frame(x_explain))) {
     stop("x_explain should be a matrix or a data.frame/data.table.\n")
   } else {
@@ -92,15 +91,14 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
 
   predict_model <- get_predict_model(predict_model, model)
 
-  if(is.null(featuremodel_object)){
-    if (! (is.matrix(x_train) || is.data.frame(x_train))) {
+  if (is.null(featuremodel_object)) {
+    if (!(is.matrix(x_train) || is.data.frame(x_train))) {
       stop("x_train should be a matrix or a data.frame/data.table, or 'featuremodel_object' must be passed\n")
     } else {
       x_train <- data.table::as.data.table(x_train)
     }
 
-    pred_train <- predict_model(model,x_train)
-
+    pred_train <- predict_model(model, x_train)
   } else { # If featuremodel_object is passed with don't need the prediction on the training data set
     pred_train <- NULL
   }
@@ -109,51 +107,61 @@ explain_mcce = function(model, x_explain, x_train, predict_model=NULL,
 
 
 
-  fit_object <- fit(x_train = x_train,
-                    pred_train = pred_train,
-                    fixed_features = fixed_features,
-                    c_int = c_int,
-                    featuremodel_object = featuremodel_object,
-                    autoregressive_model = fit.autoregressive_model,
-                    decision = fit.decision,
-                    seed = fit.seed,
-                    ...)
+  fit_object <- fit(
+    x_train = x_train,
+    pred_train = pred_train,
+    fixed_features = fixed_features,
+    c_int = c_int,
+    featuremodel_object = featuremodel_object,
+    autoregressive_model = fit.autoregressive_model,
+    decision = fit.decision,
+    seed = fit.seed,
+    ...
+  )
 
 
 
-  sim_object <- generate(x_explain = x_explain,
-                         fit_object=fit_object,
-                         K = generate.K,
-                         seed=generate.seed)
+  sim_object <- generate(
+    x_explain = x_explain,
+    fit_object = fit_object,
+    K = generate.K,
+    seed = generate.seed
+  )
 
   x_sim <- sim_object$simData
 
-  pred_sim <- predict_model(model,x_sim[,-"id_explain"])
+  pred_sim <- predict_model(model, x_sim[, -"id_explain"])
 
-  cfs <- process(x_sim = x_sim,
-                 pred_sim = pred_sim,
-                 x_explain = x_explain,
-                 fit_object = fit_object,
-                 measures = process.measures, # Don't obey this quite yet
-                 remove_invalid = process.remove_invalid,
-                 return_best_k = process.return_best_k,
-                 sort_by_measures_order = process.sort_by_measures_order)
+  cfs <- process(
+    x_sim = x_sim,
+    pred_sim = pred_sim,
+    x_explain = x_explain,
+    fit_object = fit_object,
+    measures = process.measures, # Don't obey this quite yet
+    remove_invalid = process.remove_invalid,
+    return_best_k = process.return_best_k,
+    sort_by_measures_order = process.sort_by_measures_order
+  )
 
-  time_vec <- c(fit.time=fit_object$time_fit,
-                generate.time=sim_object$time_generate,
-                process.time=cfs$time_process)
+  time_vec <- c(
+    fit.time = fit_object$time_fit,
+    generate.time = sim_object$time_generate,
+    process.time = cfs$time_process
+  )
 
-  ret <- list(cf = cfs$cf[],
-              cf_measures = cfs$cf_measures[],
-              fixed_features = fit_object$fixed_features,
-              mutable_features = fit_object$mutable_features,
-              time = time_vec)
+  ret <- list(
+    cf = cfs$cf[],
+    cf_measures = cfs$cf_measures[],
+    fixed_features = fit_object$fixed_features,
+    mutable_features = fit_object$mutable_features,
+    time = time_vec
+  )
 
-  if(return_featuremodel_object==TRUE){
+  if (return_featuremodel_object == TRUE) {
     fit_object$time_fit <- NULL # Removed
     ret$featuremodel_object <- fit_object
   }
-  if(return_sim_data==TRUE){
+  if (return_sim_data == TRUE) {
     ret$sim_data <- x_sim
   }
   if (timing == FALSE) {

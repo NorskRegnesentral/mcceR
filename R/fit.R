@@ -18,15 +18,14 @@
 #'
 #' @export
 #'
-fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),featuremodel_object = NULL,
-               autoregressive_model="ctree", seed=NULL,decision = TRUE,...){
-
-  if(!is.null(featuremodel_object)){
-    featuremodel_object$time_fit <- as.difftime(0,units = "secs")
+fit <- function(x_train, pred_train, fixed_features, c_int = c(mean(pred_train), 1), featuremodel_object = NULL,
+                autoregressive_model = "ctree", seed = NULL, decision = TRUE, ...) {
+  if (!is.null(featuremodel_object)) {
+    featuremodel_object$time_fit <- as.difftime(0, units = "secs")
     return(featuremodel_object)
   }
 
-  if(!is.null(seed)) set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
 
   if (!is.matrix(x_train) && !is.data.frame(x_train)) {
     stop("x_train should be a matrix or a data.frame/data.table.\n")
@@ -44,80 +43,82 @@ fit = function(x_train, pred_train, fixed_features, c_int=c(mean(pred_train),1),
     )
   }
 
-  if(decision){
-    decision0 <- (pred_train>=c_int[1] & pred_train<=c_int[2])*1
+  if (decision) {
+    decision0 <- (pred_train >= c_int[1] & pred_train <= c_int[2]) * 1
 
     #  x_train[,decision := decision0]
-    data.table::set(x_train, i = NULL, j="decision", value=decision0)
+    data.table::set(x_train, i = NULL, j = "decision", value = decision0)
 
-    fixed_features <- c(fixed_features,"decision")
+    fixed_features <- c(fixed_features, "decision")
   }
 
 
 
-  if(length(fixed_features)==0){
-    x_train[,dummy:=1]
+  if (length(fixed_features) == 0) {
+    x_train[, dummy := 1]
 
     mutable_features <- names(x_train)[!(names(x_train) %in% "dummy")]
 
     current_x <- "dummy"
-
   } else {
     mutable_features <- names(x_train)[!(names(x_train) %in% fixed_features)]
 
     current_x <- fixed_features
   }
 
-  N_mutable = length(mutable_features)
+  N_mutable <- length(mutable_features)
 
 
   featuremodel_list <- list()
 
-  time_fit_start = Sys.time()
+  time_fit_start <- Sys.time()
   # Fit the models
-  for(i in seq_len(N_mutable)){
-
+  for (i in seq_len(N_mutable)) {
     response <- mutable_features[i]
     features <- current_x
-    if(autoregressive_model=="ctree"){
-      featuremodel_list[[i]] <- model.ctree(response,features,data=x_train,...)
-    } else if(autoregressive_model%in% c("rpart")){
-      featuremodel_list[[i]] <- model.rpart(response,features,data=x_train,...)
+    if (autoregressive_model == "ctree") {
+      featuremodel_list[[i]] <- model.ctree(response, features, data = x_train, ...)
+    } else if (autoregressive_model %in% c("rpart")) {
+      featuremodel_list[[i]] <- model.rpart(response, features, data = x_train, ...)
     } else {
       stop("autoregressive_model argument not recognized.")
     }
 
     current_x <- c(current_x, mutable_features[i])
-#    print(i)
+    #    print(i)
   }
 
-  time_fit = difftime(Sys.time(), time_fit_start, units = "secs")
-  ret <- list(featuremodel_list = featuremodel_list,
-              time_fit = time_fit,
-              fixed_features = fixed_features,
-              mutable_features = mutable_features,
-              autoregressive_model = autoregressive_model,
-              decision = decision,
-              x_train = x_train,
-              c_int = c_int)
+  time_fit <- difftime(Sys.time(), time_fit_start, units = "secs")
+  ret <- list(
+    featuremodel_list = featuremodel_list,
+    time_fit = time_fit,
+    fixed_features = fixed_features,
+    mutable_features = mutable_features,
+    autoregressive_model = autoregressive_model,
+    decision = decision,
+    x_train = x_train,
+    c_int = c_int
+  )
 
   return(ret)
 }
 
 #' @keywords internal
-model.ctree <- function(response,features,data,...){
+model.ctree <- function(response, features, data, ...) {
   formula <- as.formula(paste0(response, "~", paste0(features, collapse = "+")))
-  mod <- party::ctree(formula = formula,
-                      data = data,
-                      ...)
-
+  mod <- party::ctree(
+    formula = formula,
+    data = data,
+    ...
+  )
 }
 
 #' @keywords internal
-model.rpart <- function(response,features,data,...){
+model.rpart <- function(response, features, data, ...) {
   formula <- as.formula(paste0(response, "~", paste0(features, collapse = "+")))
-  mod <- rpart::rpart(formula = formula,
-                      data = data,
-                      ...)
-
+  mod <- rpart::rpart(
+    formula = formula,
+    data = data,
+    ...
+  )
 }
