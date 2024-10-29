@@ -101,16 +101,19 @@ process = function(x_sim,
     res.dt <- res.dt[measure_validation==1]
   }
 
-  ret_sim0 <- res.dt[,head(.SD,return_best_k),by=id_explain][,.(row_id,counterfactual_rank,pred)]
+  cols <- c("row_id","counterfactual_rank","pred",paste0("measure_",measures))
+
+  ret_sim0 <- res.dt[,head(.SD,return_best_k),by=id_explain][,cols,with = FALSE]
 
   ret_sim <- x_sim[ret_sim0,on="row_id"]
   ret_sim[,row_id:=NULL]
 
   time_process = difftime(Sys.time(), time_process_start, units = "secs")
 
-  data.table::setcolorder(ret_sim,c("id_explain","counterfactual_rank","pred"))
+  data.table::setcolorder(ret_sim,cols[-1])
 
-  ret <- list(cf=ret_sim,
+  ret <- list(cf=ret_sim[,-cols[-1],with = FALSE],
+              cf_measures = ret_sim[,cols[-1],with = FALSE],
               time_process = time_process)
 
   return(ret)
@@ -123,25 +126,7 @@ get_measure_validation <- function(res.dt,x_explain_mutable,x_sim_mutable,c_int)
 
 
 get_measure_L0 <- function(res.dt,x_explain_mutable,x_sim_mutable){
-  n_explain <- x_explain_mutable[,.N]
-  for (i in seq_len(n_explain)){
-    value <- Rfast::colsums(unlist(x_explain_mutable[id_explain==i,-1])-t(as.matrix(x_sim_mutable[id_explain==i,-1]))==0,parallel=T)
-    res.dt[id_explain==i,measure_L0:=value]
-  }
-}
-
-get_measure_L0_new <- function(res.dt,x_explain_mutable,x_sim_mutable){
-  n_explain <- x_explain_mutable[,.N]
-  for (i in seq_len(n_explain)){
-    org <- x_explain_mutable[id_explain==i,-"id_explain"]
-    sim <- x_sim_mutable[id_explain==i,-"id_explain"]
-    value <- apply(X = sim,FUN=function(x) sum(x == org),MARGIN = 1)
-
-    res.dt[id_explain==i,measure_L0:=value]
-  }
-}
-
-get_measure_L0_new2 <- function(res.dt,x_explain_mutable,x_sim_mutable){
+  n_features <- ncol(x_explain_mutable)-1
 
   combined <- x_explain_mutable[x_sim_mutable, on = "id_explain", nomatch = 0]
 
@@ -153,9 +138,8 @@ get_measure_L0_new2 <- function(res.dt,x_explain_mutable,x_sim_mutable){
                                      .SD[, columns_to_compare, with = FALSE],
                                      .SD[, paste0("i.",columns_to_compare), with = FALSE]))]
 
-  res.dt[,measure_L0 := value]
+  res.dt[,measure_L0 := n_features-value] # Number of features changed from original value
 }
-
 
 
 get_measure_L1 <- function(res.dt,x_explain_mutable,x_sim_mutable){
