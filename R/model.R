@@ -120,7 +120,6 @@ predict_model.glm <- function(x, newdata) {
 #'
 #' @keywords internal
 get_predict_model <- function(predict_model, model) {
-
   # Checks that predict_model is a proper function (R + py)
   # Extracts natively supported functions for predict_model if exists and not passed (R only)
   # Checks that predict_model provide the right output format (R and py)
@@ -129,16 +128,16 @@ get_predict_model <- function(predict_model, model) {
   model_class0 <- class(model)[1]
 
   # checks predict_model
-  if(!(is.function(predict_model)) &&
-     !(is.null(predict_model))){
+  if (!(is.function(predict_model)) &&
+    !(is.null(predict_model))) {
     stop("`predict_model` must be NULL or a function.")
   }
 
-  supported_models <- substring(rownames(attr(methods(predict_model), "info")),first=15)
+  supported_models <- substring(rownames(attr(methods(predict_model), "info")), first = 15)
 
   # Get native predict_model if not passed and exists
   if (is.null(predict_model)) {
-    if(model_class0 %in% supported_models){
+    if (model_class0 %in% supported_models) {
       predict_model <- mcceR::predict_model
     } else {
       stop(
@@ -151,4 +150,3 @@ get_predict_model <- function(predict_model, model) {
 
   return(predict_model)
 }
-

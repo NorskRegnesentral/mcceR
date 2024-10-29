@@ -16,10 +16,7 @@
 #'
 #' @export
 #'
-generate = function(x_explain, fit_object, K = 1000, seed=NULL){
-
-
-
+generate <- function(x_explain, fit_object, K = 1000, seed = NULL) {
   mutable_features <- fit_object$mutable_features
   fixed_features <- fit_object$fixed_features
   decision <- fit_object$decision
@@ -35,15 +32,14 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
   }
 
 
-  if(decision){
-    set(x_explain, i = NULL, j="decision", value=1)
+  if (decision) {
+    set(x_explain, i = NULL, j = "decision", value = 1)
   }
 
-  if(length(fixed_features)==0){
-    x_explain[,dummy:=1]
+  if (length(fixed_features) == 0) {
+    x_explain[, dummy := 1]
 
-    dup_features <- c("dummy",fixed_features)
-
+    dup_features <- c("dummy", fixed_features)
   } else {
     dup_features <- fixed_features
   }
@@ -51,72 +47,77 @@ generate = function(x_explain, fit_object, K = 1000, seed=NULL){
 
   explain_vec <- rep(seq_len(n_explain), each = K)
 
-  time_generate_start = Sys.time()
+  time_generate_start <- Sys.time()
 
-  simData <- x_explain[explain_vec, dup_features,with=F]
+  simData <- x_explain[explain_vec, dup_features, with = F]
   simData <- data.table::setDT(simData)
 
   rowno <- seq_len(nrow(x_train))
   N_mutable <- length(mutable_features)
 
-  if(autoregressive_model=="ctree"){
-    predict_node = predict_node.ctree
-  } else if(autoregressive_model=="rpart"){
-    predict_node = predict_node.rpart
+  if (autoregressive_model == "ctree") {
+    predict_node <- predict_node.ctree
+  } else if (autoregressive_model == "rpart") {
+    predict_node <- predict_node.rpart
   }
 
-  if(!is.null(seed))set.seed(seed)
-  for(i in seq_len(N_mutable)){
+  if (!is.null(seed)) set.seed(seed)
+  for (i in seq_len(N_mutable)) {
     this_feature <- mutable_features[i]
 
     fit.nodes <- predict_node(model = featuremodel_list[[i]])
     pred.nodes <- predict_node(model = featuremodel_list[[i]], newdata = simData)
-    for (pred_node in unique(pred.nodes)){
+    for (pred_node in unique(pred.nodes)) {
       these_rows <- which(pred.nodes == pred_node)
 
-      newrowno <- sample(rowno[fit.nodes == pred_node], length(these_rows),replace = TRUE)
-      tmp <- unlist(x_train[newrowno, this_feature, with=F])
-      data.table::set(simData,i = these_rows,j=this_feature, value = tmp)
+      newrowno <- sample(rowno[fit.nodes == pred_node], length(these_rows), replace = TRUE)
+      tmp <- unlist(x_train[newrowno, this_feature, with = F])
+      data.table::set(simData, i = these_rows, j = this_feature, value = tmp)
     }
   }
 
   data.table::setcolorder(simData, neworder = names(x_train))
-  data.table::set(simData,j="id_explain", value = explain_vec)
+  data.table::set(simData, j = "id_explain", value = explain_vec)
 
-  if(length(fixed_features)==0){
-    simData[,dummy:=NULL]
+  if (length(fixed_features) == 0) {
+    simData[, dummy := NULL]
   }
 
-  if(decision){
-    data.table::set(simData, i = NULL, j="decision", value=NULL)
+  if (decision) {
+    data.table::set(simData, i = NULL, j = "decision", value = NULL)
   }
-  data.table::setcolorder(simData,"id_explain")
+  data.table::setcolorder(simData, "id_explain")
 
-  time_generate = difftime(Sys.time(), time_generate_start, units = "secs")
+  time_generate <- difftime(Sys.time(), time_generate_start, units = "secs")
 
-  ret <- list(simData = simData,
-              time_generate = time_generate)
+  ret <- list(
+    simData = simData,
+    time_generate = time_generate
+  )
 
   return(ret)
 }
 
-predict_node.ctree <- function(model,newdata=NULL){
-  party::where(object=model,newdata=newdata)
+predict_node.ctree <- function(model, newdata = NULL) {
+  party::where(object = model, newdata = newdata)
 }
 
-predict_node.rpart <- function(model,newdata=NULL,version = "new"){
-  if(version=="new"){
+predict_node.rpart <- function(model, newdata = NULL, version = "new") {
+  if (version == "new") {
     # Using a modified version of rpart_leaves from the last answer here:  https://stackoverflow.com/questions/17597739/get-id-name-of-rpart-model-nodes
     # with getFromNamespace instead of ::: to avoid CRAN notes
-    if(is.null(newdata)){
+    if (is.null(newdata)) {
       return(model$where)
     }
     if (is.null(attr(newdata, "terms"))) {
       Terms <- delete.response(model$terms)
-      newdata <- model.frame(Terms, newdata, na.action = na.pass,
-                             xlev = attr(model, "xlevels"))
-      if (!is.null(cl <- attr(Terms, "dataClasses")))
+      newdata <- model.frame(Terms, newdata,
+        na.action = na.pass,
+        xlev = attr(model, "xlevels")
+      )
+      if (!is.null(cl <- attr(Terms, "dataClasses"))) {
         .checkMFClasses(cl, newdata, TRUE)
+      }
     }
     newdata <- getFromNamespace("rpart.matrix", ns = "rpart")(newdata)
     where <- unname(getFromNamespace("pred.rpart", ns = "rpart")(model, newdata))
@@ -124,9 +125,7 @@ predict_node.rpart <- function(model,newdata=NULL,version = "new"){
   } else {
     # Using partykit::as.party(model)
     # See: "https://stackoverflow.com/questions/36748531/getting-the-observations-in-a-rparts-node-i-e-cart"
-    where <- predict(object=partykit::as.party(model),newdata=newdata,type="node")
+    where <- predict(object = partykit::as.party(model), newdata = newdata, type = "node")
     return(where)
   }
 }
-
-
